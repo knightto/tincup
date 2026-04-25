@@ -1,0 +1,330 @@
+:root {
+  --tin-cup-bg-image: url('/assets/golf-course-golf-bag-idyllic-forest-cart-summer-landscape-park-69200010.webp');
+  --tin-cup-logo-image: url('/assets/tin-cup.png');
+  --tin-cup-sky: rgba(146, 198, 235, 0.24);
+  --tin-cup-fairway: rgba(120, 173, 106, 0.24);
+  --tin-cup-sand: rgba(234, 199, 122, 0.2);
+  --tin-cup-deep: #0f2818;
+  --tin-cup-deeper: #0a1912;
+  --tin-cup-ink-dark: #17311f;
+  --tin-cup-card-top: rgba(39, 78, 50, 0.9);
+  --tin-cup-card-bottom: rgba(18, 41, 27, 0.96);
+  --tin-cup-card-edge: rgba(245, 236, 211, 0.18);
+  --tin-cup-soft-text: #dfe9d6;
+  --tin-cup-link: #f4d58b;
+  --tin-cup-link-hover: #ffe7b3;
+  --tin-cup-shadow:
+    0 22px 48px rgba(4, 14, 10, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+html {
+  background: var(--tin-cup-deeper);
+}
+
+body {
+  color: #f9f3e7;
+  background:
+    radial-gradient(circle at 12% 14%, rgba(255, 246, 219, 0.2), transparent 14%),
+    radial-gradient(circle at 86% 10%, var(--tin-cup-sky), transparent 18%),
+    radial-gradient(circle at 50% 74%, var(--tin-cup-fairway), transparent 28%),
+    linear-gradient(180deg, rgba(7, 24, 15, 0.16) 0%, rgba(7, 24, 15, 0.42) 28%, rgba(7, 18, 13, 0.88) 100%),
+    repeating-linear-gradient(90deg, transparent 0 108px, rgba(255, 255, 255, 0.03) 108px 110px),
+    var(--tin-cup-bg-image) center top / cover fixed no-repeat !important;
+  background-blend-mode: screen, screen, soft-light, normal, overlay, normal;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 34%),
+    radial-gradient(circle at 78% 82%, rgba(245, 211, 131, 0.12), transparent 24%),
+    linear-gradient(180deg, rgba(7, 17, 12, 0) 0%, rgba(7, 17, 12, 0.22) 100%);
+  opacity: 0.98;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -3% auto auto -2%;
+  width: min(340px, 34vw);
+  aspect-ratio: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.48) 0%, rgba(245, 211, 131, 0.18) 36%, transparent 70%),
+    var(--tin-cup-logo-image) center / contain no-repeat;
+  opacity: 0.14;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.18));
+  transform: rotate(-4deg);
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+.wrap,
+.container,
+.guide-wrap {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero,
+.panel,
+.card,
+.section,
+.guide-card,
+.podium-card,
+.winner-card,
+.status-chip,
+.condo-group,
+.participant-card,
+#unassignedSidebar,
+.action-card,
+.dashboard-summary-item,
+.trip-sidebar-tee-sheet,
+.trip-events-container,
+.tin-cup-score-card,
+.trip-map-panel,
+.trip-map-panel .panel,
+.guide-pill,
+.guide-link,
+.mobile-status-chip,
+.bottom-nav-link,
+.today-panel,
+.mobile-highlight-card,
+.scorecard-link-card,
+.marker-current-card {
+  backdrop-filter: blur(12px) saturate(126%);
+  -webkit-backdrop-filter: blur(12px) saturate(126%);
+}
+
+.hero,
+.panel,
+.card,
+.section,
+.guide-card,
+.podium-card,
+.winner-card,
+.condo-group,
+.participant-card,
+#unassignedSidebar,
+.trip-sidebar-tee-sheet,
+.trip-events-container,
+.tin-cup-score-card,
+.trip-map-panel,
+.trip-map-panel .panel,
+.today-panel,
+.mobile-highlight-card,
+.scorecard-link-card,
+.marker-current-card {
+  background:
+    linear-gradient(160deg, var(--tin-cup-card-top) 0%, rgba(27, 55, 36, 0.94) 48%, var(--tin-cup-card-bottom) 100%) !important;
+  border-color: var(--tin-cup-card-edge) !important;
+  box-shadow: var(--tin-cup-shadow) !important;
+}
+
+header.hero,
+.hero {
+  background:
+    radial-gradient(circle at 82% 14%, rgba(245, 211, 131, 0.12), transparent 18%),
+    linear-gradient(135deg, rgba(52, 95, 63, 0.96) 0%, rgba(24, 52, 34, 0.96) 56%, rgba(92, 131, 76, 0.9) 100%) !important;
+  border-bottom: 3px solid rgba(234, 201, 121, 0.34) !important;
+}
+
+.hero-subhead,
+.hero-subtitle,
+.hero-meta,
+.muted,
+.participant-meta,
+.dashboard-summary-item,
+.mobile-status-chip,
+.bottom-nav-link,
+.secondary-link-row a,
+.chip,
+.status-chip span {
+  color: var(--tin-cup-soft-text) !important;
+}
+
+h1 span,
+.section-label,
+.section-summary,
+.trip-modal-title span {
+  color: #f1d79b !important;
+}
+
+h1,
+h2,
+h3,
+.golf-title,
+.golf-section-title,
+.trip-modal-title {
+  text-shadow: 0 3px 14px rgba(5, 16, 10, 0.22);
+}
+
+.chip,
+.guide-pill,
+.guide-link,
+.mobile-status-chip,
+.bottom-nav-link,
+.status-chip,
+.dashboard-summary-item,
+.action-card {
+  background:
+    linear-gradient(135deg, rgba(255, 249, 236, 0.12), rgba(219, 187, 110, 0.1)) !important;
+  border-color: rgba(245, 224, 176, 0.2) !important;
+  box-shadow:
+    0 10px 22px rgba(8, 21, 14, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.bottom-nav-link.active,
+.chip-button,
+.status-chip.ready {
+  background:
+    linear-gradient(135deg, rgba(236, 198, 108, 0.94), rgba(139, 184, 109, 0.92)) !important;
+  border-color: rgba(247, 229, 183, 0.24) !important;
+  color: var(--tin-cup-ink-dark) !important;
+  box-shadow:
+    0 14px 28px rgba(8, 21, 14, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.action-card,
+.trip-event-card,
+.participant-card,
+.tin-cup-score-card,
+.trip-sidebar-tee-sheet .panel,
+.trip-map-panel .panel,
+.scorecard-link-card,
+.winner-card,
+.podium-card,
+.marker-current-card {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03)) !important;
+}
+
+.chip::before,
+.guide-pill::before,
+.guide-link::before,
+.golf-title::before,
+.scorecard-link-title::before,
+.hole-nav-hole::before,
+.section-summary::before,
+h1::before {
+  filter: drop-shadow(0 0 8px rgba(244, 208, 128, 0.24));
+}
+
+a {
+  color: var(--tin-cup-link);
+}
+
+a:hover {
+  color: var(--tin-cup-link-hover);
+}
+
+input,
+select,
+textarea,
+button {
+  box-shadow: none;
+}
+
+input,
+select,
+textarea {
+  color: #f8f4e8 !important;
+  border-color: rgba(233, 245, 222, 0.16) !important;
+  background: rgba(13, 33, 22, 0.88) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(223, 233, 214, 0.7) !important;
+}
+
+button,
+.cta {
+  color: #fff7e8 !important;
+  background:
+    linear-gradient(135deg, rgba(216, 170, 82, 0.26), rgba(124, 167, 103, 0.2)) !important;
+  border-color: rgba(236, 206, 140, 0.28) !important;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+button:hover,
+.cta:hover {
+  transform: translateY(-1px);
+  background:
+    linear-gradient(135deg, rgba(232, 189, 107, 0.36), rgba(145, 189, 121, 0.26)) !important;
+  box-shadow: 0 12px 24px rgba(7, 18, 13, 0.2);
+}
+
+table th {
+  background: rgba(12, 28, 19, 0.74);
+}
+
+.app-bottom-nav {
+  background: rgba(10, 24, 17, 0.94) !important;
+  border-color: rgba(234, 219, 179, 0.16) !important;
+  box-shadow: 0 -14px 32px rgba(3, 10, 7, 0.3);
+  backdrop-filter: blur(14px) saturate(126%);
+  -webkit-backdrop-filter: blur(14px) saturate(126%);
+}
+
+.bottom-nav-link {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+dialog {
+  box-shadow:
+    0 24px 56px rgba(6, 18, 11, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 900px) {
+  body {
+    background-attachment: scroll !important;
+  }
+
+  body::after {
+    width: min(240px, 44vw);
+    opacity: 0.11;
+  }
+}
+
+@media (max-width: 640px) {
+  body::after {
+    display: none;
+  }
+
+  .hero,
+  .panel,
+  .card,
+  .section,
+  .guide-card,
+  .podium-card,
+  .winner-card,
+  .condo-group,
+  .participant-card,
+  #unassignedSidebar,
+  .trip-sidebar-tee-sheet,
+  .trip-events-container,
+  .tin-cup-score-card,
+  .trip-map-panel,
+  .trip-map-panel .panel,
+  .today-panel,
+  .mobile-highlight-card,
+  .scorecard-link-card,
+  .marker-current-card {
+    box-shadow:
+      0 16px 32px rgba(4, 14, 10, 0.26),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  }
+}

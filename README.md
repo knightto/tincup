@@ -1,4 +1,17 @@
-# Tin Cup XX Tournament App
+# Tin Cup Tournament App
+
+This repo is now the `tincup` home for the standalone TypeScript/Postgres app that previously lived as `tincup5`.
+
+It also includes a mirrored snapshot of the live Tin Cup implementation that currently runs inside the Render-integrated Tee Time BRS app:
+
+- `render-integration/main-repo-snapshot/public/tin-cup/`
+- `render-integration/main-repo-snapshot/routes/trips.js`
+- `render-integration/main-repo-snapshot/services/tinCupLiveService.js`
+- `render-integration/main-repo-snapshot/models/`
+- `render-integration/main-repo-snapshot/scripts/seed_tin_cup_trip.js`
+- `render-integration/main-repo-snapshot/tests/`
+
+That snapshot is intentionally stored without changing the live Render app yet, so the current site, database wiring, and URLs continue to work while the Tin Cup code now has a dedicated repository home.
 
 ## Requirements
 - Node.js 20+

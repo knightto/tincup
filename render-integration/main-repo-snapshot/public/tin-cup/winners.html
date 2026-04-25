@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tin Cup Winners Mode</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/tin-cup/manifest.json">
+  <meta name="theme-color" content="#173224">
+  <meta name="application-name" content="Tin Cup 2026">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tin Cup">
+  <link rel="apple-touch-icon" href="/assets/tin-cup.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <style>
+    :root {
+      --bg:#102217;
+      --panel:#274235;
+      --panel-soft:#1f3427;
+      --line:rgba(232,255,219,.14);
+      --ink:#f9f3e7;
+      --muted:#d2dfc3;
+      --accent:#c89a4b;
+      --success:#dff6d9;
+      --success-line:rgba(94,214,122,.45);
+      --ready:#dbeeff;
+      --ready-line:rgba(94,173,255,.45);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:'Segoe UI', Arial, sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(200,154,75,.14), transparent 28%),
+        linear-gradient(180deg, #112417 0%, #0c1a12 100%);
+      min-height:100vh;
+    }
+    .wrap {
+      max-width:1120px;
+      margin:0 auto;
+      padding:24px 18px 40px;
+      display:grid;
+      gap:16px;
+    }
+    .hero,
+    .section {
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:linear-gradient(140deg, var(--panel), var(--panel-soft));
+      box-shadow:0 22px 44px rgba(0,0,0,.24);
+    }
+    .hero {
+      padding:18px;
+      display:grid;
+      gap:12px;
+    }
+    .hero-head {
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    h1 {
+      margin:0;
+      font-size:clamp(1.5rem, 4vw, 2.3rem);
+      line-height:1.05;
+    }
+    .hero-subtitle {
+      color:var(--muted);
+      font-size:.95rem;
+      max-width:720px;
+      line-height:1.5;
+    }
+    .hero-meta {
+      color:var(--muted);
+      font-size:.82rem;
+      text-align:right;
+      display:grid;
+      gap:4px;
+    }
+    .status-strip,
+    .podium,
+    .split-grid,
+    .winner-grid {
+      display:grid;
+      gap:12px;
+    }
+    .status-strip {
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    }
+    .status-chip {
+      border-radius:14px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+    .status-chip strong {
+      display:block;
+      font-size:.72rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:5px;
+    }
+    .status-chip span {
+      font-size:1rem;
+      font-weight:800;
+    }
+    .status-chip.ready {
+      border-color:var(--ready-line);
+      background:rgba(94,173,255,.12);
+      color:var(--ready);
+    }
+    .status-chip.live {
+      border-color:var(--success-line);
+      background:rgba(94,214,122,.12);
+      color:var(--success);
+    }
+    .podium {
+      grid-template-columns:1.15fr .95fr .95fr;
+    }
+    .podium-card {
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      background:rgba(255,255,255,.04);
+      display:grid;
+      gap:8px;
+      min-height:152px;
+    }
+    .podium-rank {
+      color:var(--accent);
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .podium-name {
+      font-size:1.45rem;
+      font-weight:900;
+      line-height:1.05;
+    }
+    .podium-points {
+      font-size:1rem;
+      font-weight:700;
+    }
+    .podium-note {
+      color:var(--muted);
+      font-size:.84rem;
+      line-height:1.45;
+    }
+    .section {
+      padding:16px;
+    }
+    .section h2 {
+      margin:0 0 10px 0;
+      font-size:1.05rem;
+    }
+    .split-grid {
+      grid-template-columns:1.05fr .95fr;
+    }
+    .winner-grid {
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .winner-card {
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      background:rgba(255,255,255,.04);
+      display:grid;
+      gap:5px;
+    }
+    .winner-card strong {
+      font-size:.75rem;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .winner-card span {
+      font-size:1rem;
+      font-weight:800;
+    }
+    .winner-list,
+    .proof-list {
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      display:grid;
+      gap:6px;
+    }
+    .winner-list li strong,
+    .proof-list li strong {
+      color:var(--ink);
+    }
+    .empty-state {
+      border:1px dashed rgba(255,255,255,.16);
+      border-radius:14px;
+      padding:14px;
+      color:var(--muted);
+      background:rgba(255,255,255,.03);
+    }
+    @media (max-width: 820px) {
+      .podium,
+      .split-grid {
+        grid-template-columns:1fr;
+      }
+      .hero-meta {
+        text-align:left;
+      }
+    }
+    @media print {
+      body {
+        background:#fff;
+        color:#132016;
+      }
+      .wrap {
+        max-width:100%;
+        padding:0;
+      }
+      .hero,
+      .section,
+      .podium-card,
+      .winner-card,
+      .status-chip {
+        box-shadow:none;
+        background:#fff;
+        color:#132016;
+        border-color:#c8d4cb;
+      }
+      .hero-subtitle,
+      .hero-meta,
+      .winner-list,
+      .proof-list,
+      .podium-note,
+      .status-chip strong,
+      .winner-card strong {
+        color:#3d5246;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/tin-cup/theme.css">
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-head">
+        <div>
+          <h1>Tin Cup Winners Mode</h1>
+          <div class="hero-subtitle">A clean presentation of final standings, prize winners, side games, and scoring verification from the saved Tin Cup competition.</div>
+        </div>
+        <div class="hero-meta" id="heroMeta">
+          <div>Loading Tin Cup results...</div>
+        </div>
+      </div>
+      <div class="status-strip" id="statusStrip"></div>
+    </section>
+
+    <section class="section">
+      <h2>Final Standings</h2>
+      <div class="podium" id="podium"></div>
+    </section>
+
+    <section class="section">
+      <h2>Prize Winners</h2>
+      <div class="winner-grid" id="prizeWinners"></div>
+    </section>
+
+    <section class="section split-grid">
+      <div>
+        <h2>Side Games</h2>
+        <div id="sideGames"></div>
+      </div>
+      <div>
+        <h2>Scoring Verified</h2>
+        <div id="proofSummary"></div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const TIN_CUP_CONTEXT_STORAGE_KEY = 'tinCupTripContextV1';
+    let tripId = null;
+    let useSecondaryTripDb = false;
+    let contextSource = 'unknown';
+
+    const heroMetaEl = document.getElementById('heroMeta');
+    const statusStripEl = document.getElementById('statusStrip');
+    const podiumEl = document.getElementById('podium');
+    const prizeWinnersEl = document.getElementById('prizeWinners');
+    const sideGamesEl = document.getElementById('sideGames');
+    const proofSummaryEl = document.getElementById('proofSummary');
+
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (ch) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+    const tripApi = (path) => useSecondaryTripDb ? (path.includes('?') ? `${path}&myrtleBeach2026=true` : `${path}?myrtleBeach2026=true`) : path;
+    const currency = (v) => `$${Math.round(Number(v || 0))}`;
+
+    function loadContext() {
+      const qs = new URLSearchParams(window.location.search);
+      const qTrip = String(qs.get('tripId') || '').trim();
+      const qSecondary = String(qs.get('secondary') || '').trim();
+      if (qSecondary === '0' || qSecondary.toLowerCase() === 'false') useSecondaryTripDb = false;
+      if (qSecondary === '1' || qSecondary.toLowerCase() === 'true') useSecondaryTripDb = true;
+      if (qTrip) { tripId = qTrip; contextSource = 'query'; return; }
+      try {
+        const raw = localStorage.getItem(TIN_CUP_CONTEXT_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.tripId) { tripId = String(parsed.tripId); contextSource = 'storage'; }
+        if (parsed && (parsed.secondary === '0' || parsed.secondary === 0 || parsed.secondary === false)) useSecondaryTripDb = false;
+        if (parsed && (parsed.secondary === '1' || parsed.secondary === 1 || parsed.secondary === true)) useSecondaryTripDb = true;
+      } catch (_err) {}
+    }
+
+    function findTinCupTrip(trips) {
+      const list = Array.isArray(trips) ? trips : [];
+      return list.find((t) => /tin\s*cup/i.test(String(t && t.name || '')))
+        || list.find((t) => /tin\s*cup/i.test(String(t && t.groupName || '')))
+        || list.find((t) => /tin\s*cup/i.test(String(t && t.reservationNumber || '')))
+        || list.find((t) => t && t.tinCupLive && typeof t.tinCupLive === 'object')
+        || null;
+    }
+
+    async function discoverTripId() {
+      let res = await fetch(tripApi('/api/trips'));
+      if (res.ok) {
+        const trips = await res.json();
+        const found = findTinCupTrip(trips);
+        if (found && found._id) {
+          tripId = String(found._id);
+          contextSource = useSecondaryTripDb ? 'discover-secondary' : 'discover-primary';
+          return;
+        }
+      }
+      useSecondaryTripDb = !useSecondaryTripDb;
+      res = await fetch(tripApi('/api/trips'));
+      if (!res.ok) throw new Error(`Trip list request failed (${res.status})`);
+      const trips = await res.json();
+      const found = findTinCupTrip(trips);
+      if (!found || !found._id) throw new Error('Tin Cup trip not found');
+      tripId = String(found._id);
+      contextSource = useSecondaryTripDb ? 'discover-secondary' : 'discover-primary';
+    }
+
+    async function resolveTripId() {
+      if (!tripId) await discoverTripId();
+      return tripId;
+    }
+
+    async function fetchLeaderboardForCurrentDb() {
+      const id = await resolveTripId();
+      const response = await fetch(tripApi(`/api/trips/${id}/tin-cup/live/leaderboard`), { cache: 'no-store' });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || `Leaderboard request failed (${response.status})`);
+      return payload;
+    }
+
+    async function fetchLeaderboard() {
+      try {
+        return await fetchLeaderboardForCurrentDb();
+      } catch (error) {
+        const message = (error && error.message) ? error.message : 'Failed to load winners';
+        if (!tripId || !/trip not found/i.test(message)) throw error;
+        useSecondaryTripDb = !useSecondaryTripDb;
+        contextSource = useSecondaryTripDb ? 'retry-secondary' : 'retry-primary';
+        return fetchLeaderboardForCurrentDb();
+      }
+    }
+
+    function renderStatus(payload) {
+      const totals = Array.isArray(payload.totals) ? payload.totals : [];
+      const payouts = payload.payouts || {};
+      const sideGames = payload.sideGames || {};
+      const skins = payload.skins || {};
+      const longPuttDays = (((sideGames.longPutt || {}).days) || []).filter((row) => row && row.winner);
+      const snowmanDays = (((sideGames.secretSnowman || {}).days) || []).filter((row) => row && row.winner);
+      const reportReady = totals.length > 0;
+      const sideGameCount = longPuttDays.length + snowmanDays.length;
+      const skinWinners = Array.isArray(skins.totals) ? skins.totals.filter((row) => Number(row && row.skins || 0) > 0).length : 0;
+      statusStripEl.innerHTML = `
+        <div class="status-chip ${reportReady ? 'ready' : ''}"><strong>Presentation</strong><span>${reportReady ? 'Ready to present' : 'Waiting on results'}</span></div>
+        <div class="status-chip live"><strong>Standings</strong><span>${totals.length ? `${totals.length} golfers ranked` : 'No standings yet'}</span></div>
+        <div class="status-chip ready"><strong>Payouts</strong><span>${Array.isArray(payouts.rows) && payouts.rows.length ? `${payouts.rows.length} winners paid` : 'No payouts yet'}</span></div>
+        <div class="status-chip ${sideGameCount ? 'ready' : ''}"><strong>Side Games</strong><span>${sideGameCount ? `${sideGameCount} winner entries` : 'No side games yet'}</span></div>
+        <div class="status-chip ${skinWinners ? 'ready' : ''}"><strong>Skins</strong><span>${skinWinners ? `${skinWinners} skin winner${skinWinners === 1 ? '' : 's'}` : 'No skins yet'}</span></div>
+      `;
+      heroMetaEl.innerHTML = `
+        <div>Generated: ${esc(new Date().toLocaleString())}</div>
+        <div>Data: ${contextSource === 'local-fallback' ? 'Local fallback' : (useSecondaryTripDb ? 'Secondary trip database' : 'Primary trip database')}</div>
+      `;
+    }
+
+    function renderPodium(payload) {
+      const totals = Array.isArray(payload.totals) ? payload.totals.slice(0, 3) : [];
+      if (!totals.length) {
+        podiumEl.innerHTML = '<div class="empty-state">No final standings are available yet.</div>';
+        return;
+      }
+      const labels = ['Champion', 'Runner-Up', 'Third Place'];
+      podiumEl.innerHTML = totals.map((row, index) => `
+        <div class="podium-card">
+          <div class="podium-rank">${esc(labels[index] || `Place ${index + 1}`)}</div>
+          <div class="podium-name">${esc(row.name)}</div>
+          <div class="podium-points">${esc(row.total)} points</div>
+          <div class="podium-note">Day 4 rank points ${esc(row.day4Points || 0)}${Number.isInteger(row.day4Rank) ? ` | Rank ${esc(row.day4Rank)}` : ''}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderPrizeWinners(payload) {
+      const payouts = payload.payouts || {};
+      const rows = Array.isArray(payouts.rows) ? payouts.rows.filter((row) => Number(row.total || 0) > 0).slice(0, 8) : [];
+      if (!rows.length) {
+        prizeWinnersEl.innerHTML = '<div class="empty-state">No prize winners are available yet.</div>';
+        return;
+      }
+      prizeWinnersEl.innerHTML = rows.map((row) => `
+        <div class="winner-card">
+          <strong>${esc(row.name)}</strong>
+          <span>${currency(row.total)}</span>
+          <div class="hero-subtitle" style="font-size:.82rem;">
+            Final ${currency(row.finalPrize)} | CTP ${currency(row.ctp)} | Long Drive ${currency(row.longDrive)} | Long Putt ${currency(row.longPutt)} | Secret Snowman ${currency(row.secretSnowman)} | Skins ${currency(row.skins)}${Number(row.loser || 0) ? ` | Loser ${currency(row.loser)}` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderSideGames(payload) {
+      const sideGames = payload.sideGames || {};
+      const skins = payload.skins || {};
+      const scramble = payload.scramble || {};
+      const lines = [];
+      const longPuttDays = (((sideGames.longPutt || {}).days) || []).filter((row) => row && row.winner);
+      const snowmanDays = (((sideGames.secretSnowman || {}).days) || []).filter((row) => row && row.winner);
+      longPuttDays.forEach((row) => lines.push(`<li><strong>Long Putt ${esc(row.dayKey)}</strong> - ${esc(row.winner)}</li>`));
+      snowmanDays.forEach((row) => lines.push(`<li><strong>Secret Snowman ${esc(row.dayKey)}</strong> - ${esc(row.winner)}</li>`));
+      const scrambleRows = Array.isArray(scramble.teams) ? scramble.teams.filter((team) => team.rank !== null).sort((a, b) => (a.rank - b.rank) || a.label.localeCompare(b.label)) : [];
+      if (scrambleRows.length) {
+        const team = scrambleRows[0];
+        lines.push(`<li><strong>Scramble Champion</strong> - ${esc(team.label)} (${esc((team.players || []).join(', '))}) with ${team.total === null ? '-' : esc(team.total)} total and ${esc(team.points || 0)} pts</li>`);
+      }
+      const skinRows = Array.isArray(skins.totals) ? skins.totals.filter((row) => Number(row.skins || 0) > 0).slice(0, 5) : [];
+      skinRows.forEach((row) => lines.push(`<li><strong>Skins</strong> - ${esc(row.name)} won ${esc(row.skins)} for ${currency(row.payout)}</li>`));
+      sideGamesEl.innerHTML = lines.length
+        ? `<ul class="winner-list">${lines.join('')}</ul>`
+        : '<div class="empty-state">No side-game winners are available yet.</div>';
+    }
+
+    function renderProof(payload) {
+      const proofs = [
+        'Final standings are derived directly from saved live scorecards and submitted scoring data.',
+        'Prize winners and payouts come from the final Tin Cup payout calculation for this event state.',
+        'Side games, scramble results, and skins are pulled from the same saved competition inputs used by the Results page.',
+        'Use Stroke Results and Workbook Results Audit on the Results page if anyone wants a deeper cross-check.'
+      ];
+      const totals = Array.isArray(payload.totals) ? payload.totals : [];
+      if (totals.length) {
+        proofs.unshift(`Scoring verified: ${totals.length} golfers are ranked with gross/net stroke, match, scramble, and payout math aligned.`);
+      }
+      proofSummaryEl.innerHTML = `<ul class="proof-list">${proofs.map((line) => `<li>${esc(line)}</li>`).join('')}</ul>`;
+    }
+
+    async function renderPage() {
+      loadContext();
+      try {
+        const payload = await fetchLeaderboard();
+        renderStatus(payload);
+        renderPodium(payload);
+        renderPrizeWinners(payload);
+        renderSideGames(payload);
+        renderProof(payload);
+        const qs = new URLSearchParams(window.location.search);
+        const print = String(qs.get('print') || '').trim().toLowerCase();
+        if (print === '1' || print === 'true') {
+          window.setTimeout(() => window.print(), 150);
+        }
+      } catch (error) {
+        const message = error && error.message ? error.message : 'Failed to load Winners Mode.';
+        heroMetaEl.innerHTML = `<div>${esc(message)}</div>`;
+        statusStripEl.innerHTML = '<div class="status-chip">Winners Mode unavailable</div>';
+        podiumEl.innerHTML = `<div class="empty-state">${esc(message)}</div>`;
+        prizeWinnersEl.innerHTML = '<div class="empty-state">No prize winners to show.</div>';
+        sideGamesEl.innerHTML = '<div class="empty-state">No side-game winners to show.</div>';
+        proofSummaryEl.innerHTML = '<div class="empty-state">Scoring verification will appear once results are available.</div>';
+      }
+    }
+
+    renderPage();
+  </script>
+</body>
+</html>

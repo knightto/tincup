@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tin Cup Results</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/tin-cup/manifest.json">
+  <meta name="theme-color" content="#173224">
+  <meta name="application-name" content="Tin Cup 2026">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tin Cup">
+  <link rel="apple-touch-icon" href="/assets/tin-cup.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/pwa-shell.css">
+  <script src="/pwa-shell.js" defer></script>
+  <style>
+    :root { --bg:#112417; --panel:#274235; --ink:#f9f3e7; --ink-soft:#d2dfc3; --line:rgba(232,255,219,.14); --accent:#c89a4b; --icon-flag:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c89a4b' d='M6 3a1 1 0 0 1 1 1v2h9.6l-1.3 3 1.3 3H7v8H5V4a1 1 0 0 1 1-1Z'/%3E%3Ccircle cx='6' cy='20' r='2' fill='%23d2dfc3'/%3E%3C/svg%3E"); --icon-ball:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23f9f3e7' stroke='%23c89a4b' stroke-width='1.5'/%3E%3Ccircle cx='9' cy='9' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='13.5' cy='8' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='15.5' cy='12' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='10.5' cy='14' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='13.5' cy='16' r='1' fill='%23c89a4b'/%3E%3C/svg%3E"); }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; color:var(--ink); background:radial-gradient(circle at 20% 20%, rgba(200,154,75,.14), transparent 35%), #112417; padding-bottom:84px; }
+    .wrap { max-width:1120px; margin:18px auto 36px; padding:0 14px; }
+    .hero,.card { background:linear-gradient(145deg,var(--panel) 0%, #1f3427 100%); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px; }
+    .section-label { margin:18px 0 8px; color:var(--ink-soft); font-size:.78rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .section-label:first-of-type { margin-top:0; }
+    h1,
+    .toolbar strong {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    h1 { margin:0; font-size:1.35rem; }
+    h1::before,
+    .toolbar strong::before {
+      content:"";
+      width:15px;
+      height:15px;
+      display:inline-block;
+      flex:0 0 15px;
+      background-repeat:no-repeat;
+      background-position:center;
+      background-size:contain;
+    }
+    h1::before {
+      background-image:var(--icon-flag);
+    }
+    .toolbar strong::before {
+      background-image:var(--icon-ball);
+    }
+    .section-summary {
+      cursor:pointer;
+      font-weight:700;
+      position:relative;
+      padding-left:24px;
+    }
+    .section-summary::before {
+      content:"";
+      position:absolute;
+      left:0;
+      top:50%;
+      width:15px;
+      height:15px;
+      transform:translateY(-50%);
+      background-image:var(--icon-flag);
+      background-repeat:no-repeat;
+      background-position:center;
+      background-size:contain;
+    }
+    .hero-row { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; }
+    .muted { color:var(--ink-soft); font-size:.86rem; }
+    .cta { color:var(--accent); text-decoration:none; font-weight:700; }
+    .cta:hover { text-decoration:underline; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+    select { background:#173224; color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:6px 9px; }
+    table { width:100%; border-collapse:collapse; font-size:.88rem; }
+    th,td { border-bottom:1px solid var(--line); padding:7px 8px; text-align:left; vertical-align:top; }
+    th { color:var(--ink-soft); font-weight:700; }
+    .refresh-note { font-size:.78rem; color:var(--ink-soft); }
+    .tab-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+    .tab-btn { background:#173224; color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:6px 10px; cursor:pointer; font-weight:700; font-size:.8rem; }
+    .tab-btn::before {
+      content:"";
+      width:11px;
+      height:11px;
+      display:inline-block;
+      margin-right:6px;
+      vertical-align:-1px;
+      background-image:var(--icon-ball);
+      background-repeat:no-repeat;
+      background-position:center;
+      background-size:contain;
+    }
+    .tab-btn.active { border-color:rgba(200,154,75,.65); background:rgba(200,154,75,.18); color:#f4e5bf; }
+    .match-result { display:inline-block; margin-left:6px; color:var(--ink-soft); font-size:.78rem; font-weight:700; }
+    .report-toolbar { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+    .report-btn { background:#173224; color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; font-weight:700; }
+    .report-btn:hover { background:rgba(200,154,75,.18); border-color:rgba(200,154,75,.45); }
+    .report-shell { display:grid; gap:10px; }
+    .report-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:rgba(255,255,255,.03); }
+    .report-head h3 { margin:0; font-size:1rem; }
+    .report-meta { color:var(--ink-soft); font-size:.8rem; display:grid; gap:3px; text-align:right; }
+    .report-highlights { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:8px; }
+    .report-stat { border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:rgba(255,255,255,.025); }
+    .report-stat-label { color:var(--ink-soft); font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; }
+    .report-stat-value { margin-top:3px; font-size:1rem; font-weight:800; }
+    .report-block { border:1px solid var(--line); border-radius:12px; padding:10px 12px; background:rgba(255,255,255,.03); }
+    .report-block h3 { margin:0 0 7px 0; font-size:.95rem; color:var(--ink); }
+    .report-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px; }
+    .report-list { margin:0; padding-left:16px; }
+    .report-list li { margin:0 0 4px 0; color:var(--ink-soft); }
+    .report-list li:last-child { margin-bottom:0; }
+    .report-standings { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:8px; }
+    .report-place { border:1px solid var(--line); border-radius:10px; padding:8px 10px; background:rgba(255,255,255,.025); }
+    .report-place-rank { color:var(--accent); font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
+    .report-place-name { margin-top:3px; font-weight:800; }
+    .report-place-value { color:var(--ink-soft); font-size:.84rem; }
+    .report-proof { display:grid; gap:6px; color:var(--ink-soft); font-size:.86rem; }
+    .report-empty { color:var(--ink-soft); font-size:.9rem; }
+    .mobile-view-row,
+    .status-row {
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .view-btn,
+    .status-chip,
+    .bottom-nav-link {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#173224;
+      color:var(--ink);
+      text-decoration:none;
+      font-weight:700;
+    }
+    .view-btn {
+      padding:8px 12px;
+      font-size:.82rem;
+      cursor:pointer;
+    }
+    .view-btn.active {
+      border-color:rgba(200,154,75,.75);
+      background:rgba(200,154,75,.22);
+      color:#f4e5bf;
+    }
+    .status-chip {
+      padding:6px 10px;
+      font-size:.78rem;
+      background:rgba(255,255,255,.05);
+    }
+    .status-chip.warn {
+      border-color:rgba(200,154,75,.45);
+      color:#f4e5bf;
+    }
+    .status-chip.live {
+      border-color:rgba(94,214,122,.45);
+      background:rgba(94,214,122,.14);
+      color:#dff6d9;
+    }
+    .status-chip.ready {
+      border-color:rgba(94,173,255,.45);
+      background:rgba(94,173,255,.14);
+      color:#dbeeff;
+    }
+    .table-note {
+      margin-bottom:10px;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      color:var(--ink-soft);
+      font-size:.82rem;
+    }
+    .table-note.warn {
+      border-color:rgba(200,154,75,.45);
+      background:rgba(200,154,75,.12);
+      color:#f4e5bf;
+    }
+    .table-note.ready {
+      border-color:rgba(94,173,255,.45);
+      background:rgba(94,173,255,.12);
+      color:#dbeeff;
+    }
+    .app-bottom-nav {
+      position:fixed;
+      left:12px;
+      right:12px;
+      bottom:12px;
+      z-index:1200;
+      display:flex;
+      gap:8px;
+      justify-content:space-between;
+      padding:8px;
+      background:rgba(16, 36, 29, .96);
+      border:1px solid var(--line);
+      border-radius:16px;
+      backdrop-filter:blur(12px);
+      box-shadow:0 18px 40px rgba(0,0,0,.28);
+    }
+    .bottom-nav-link {
+      flex:1 1 0;
+      min-width:0;
+      padding:8px 6px;
+      background:transparent;
+      border-color:transparent;
+      font-size:.74rem;
+      text-align:center;
+      color:var(--ink-soft);
+    }
+    .bottom-nav-link.active {
+      background:rgba(200,154,75,.18);
+      border-color:rgba(200,154,75,.5);
+      color:#f4e5bf;
+    }
+    .mobile-highlight-card {
+      display:grid;
+      gap:8px;
+    }
+    @media (max-width: 640px) {
+      .app-bottom-nav {
+        left:10px;
+        right:10px;
+        bottom:10px;
+        gap:4px;
+      }
+      .bottom-nav-link {
+        font-size:.7rem;
+        padding:8px 4px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #132016;
+        font-size: 11pt;
+      }
+      .wrap {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .hero,
+      .section-label,
+      .card:not(#readable-report),
+      .report-toolbar,
+      .cta,
+      .refresh-note {
+        display: none !important;
+      }
+      #readable-report {
+        display: block !important;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        border: 0;
+        box-shadow: none;
+      }
+      #readable-report details {
+        display: block;
+      }
+      #readable-report summary,
+      #readable-report .toolbar .muted {
+        display: none !important;
+      }
+      #readable-report .toolbar {
+        margin: 0 0 10pt 0;
+      }
+      #readable-report .toolbar strong {
+        color: #132016;
+        font-size: 16pt;
+      }
+      #readable-report .report-head,
+      #readable-report .report-block,
+      #readable-report .report-stat,
+      #readable-report .report-place {
+        background: #fff;
+        color: #132016;
+        border: 1px solid #c7d1c7;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      #readable-report .report-meta,
+      #readable-report .report-list li,
+      #readable-report .report-place-value,
+      #readable-report .report-proof,
+      #readable-report .report-stat-label,
+      #readable-report .report-empty {
+        color: #425243 !important;
+      }
+      #readable-report .report-place-rank,
+      #readable-report .report-stat-value,
+      #readable-report .report-block h3,
+      #readable-report .report-head h3 {
+        color: #132016 !important;
+      }
+      #readable-report .report-shell,
+      #readable-report .report-grid,
+      #readable-report .report-highlights,
+      #readable-report .report-standings {
+        gap: 8pt;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    }
+
+  </style>
+  <link rel="stylesheet" href="/tin-cup/theme.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-row">
+        <div>
+          <h1>Tin Cup Results</h1>
+          <div class="muted">Live standings, side games, payouts, and scoring verification from the Tin Cup scoring system.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mobile-highlight-card">
+      <div class="mobile-view-row">
+        <a id="resultsShortcutScore" class="view-btn" href="/tin-cup/scorekeeper.html">Score</a>
+        <a id="resultsShortcutToday" class="view-btn" href="/tin-cup/today.html">Today</a>
+        <a id="resultsShortcutTrip" class="view-btn" href="/tin-cup/trip-2026.html">Trip</a>
+      </div>
+      <div class="muted">Fast path back to live scoring, current-round links, and the trip hub.</div>
+      <div class="mobile-view-row">
+        <button class="view-btn active" type="button" data-view-target="tripBoardCard">Leaderboard</button>
+        <button class="view-btn" type="button" data-view-target="dayBoardCard">Day Leaders</button>
+        <button class="view-btn" type="button" data-view-target="readable-report">Winners</button>
+        <button class="view-btn" type="button" data-view-target="workbookAuditCard">Audit</button>
+      </div>
+    </div>
+
+    <div class="section-label">Live Results</div>
+    <div class="card" id="tripBoardCard">
+      <details open>
+        <summary class="section-summary">Live Tin Cup 2026 Leaderboard</summary>
+        <div class="toolbar">
+          <strong>Live Tin Cup 2026 Leaderboard</strong>
+          <span class="refresh-note" id="refreshNote"></span>
+        </div>
+        <div id="tripBoard"></div>
+      </details>
+    </div>
+
+    <div class="card" id="dayBoardCard">
+      <details open>
+        <summary class="section-summary">Live Day Leaderboard</summary>
+        <div class="toolbar">
+          <strong>Live Day Leaderboard</strong>
+          <label class="muted">Day:
+            <select id="daySelect"></select>
+          </label>
+        </div>
+        <div id="dayBoard"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary class="section-summary">Tin Cup Match Scoring By Day</summary>
+        <div class="toolbar">
+          <strong>Tin Cup Match Scoring By Day</strong>
+          <span class="muted">Toggle day to view matchups and current W/T/L status</span>
+        </div>
+        <div id="matchDayTabs" class="tab-row"></div>
+        <div id="matchBoard"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary class="section-summary">Stroke Results (Read-Only)</summary>
+        <div class="toolbar">
+          <strong>Stroke Results (Read-Only)</strong>
+          <span class="muted">Auto-derived from live scorecards for scoring confirmation.</span>
+        </div>
+        <div id="strokeBoard"></div>
+      </details>
+    </div>
+
+    <div class="section-label">Presentation Summary</div>
+    <div class="card" id="readable-report">
+      <details>
+        <summary class="section-summary">Readable Final Report</summary>
+        <div class="toolbar">
+          <strong>Readable Final Report</strong>
+          <span class="muted">A presentation-friendly summary of winners, standings, and scoring proof.</span>
+        </div>
+        <div class="report-toolbar">
+          <button id="generateReportBtn" class="report-btn" type="button">Generate Readable Report</button>
+          <button id="printReportBtn" class="report-btn" type="button">Print / Save As PDF</button>
+          <button id="openWinnersModeBtn" class="report-btn" type="button">Open Winners Mode</button>
+          <button id="shareReportBtn" class="report-btn" type="button">Share Winners Summary</button>
+        </div>
+        <div id="readableReport"></div>
+      </details>
+    </div>
+
+    <div class="section-label">Side Games And Payouts</div>
+    <div class="card">
+      <details>
+        <summary class="section-summary">Skins</summary>
+        <div class="toolbar">
+          <strong>Skins Summary</strong>
+          <span class="muted">Unique low-net skins auto-derived from live hole scores.</span>
+        </div>
+        <div id="skinsBoard"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary class="section-summary">Scramble</summary>
+        <div class="toolbar">
+          <strong>Scramble Results</strong>
+          <span class="muted">Team totals and awarded scramble points.</span>
+        </div>
+        <div id="scrambleBoard"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary class="section-summary">Side Game Winners</summary>
+        <div class="toolbar">
+          <strong>Side Game Winners</strong>
+          <span class="muted">Workbook side-game winners for Long Putt and Secret Snowman.</span>
+        </div>
+        <div id="sideGamesBoard"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary class="section-summary">Payouts</summary>
+        <div class="toolbar">
+          <strong>Payout Summary</strong>
+          <span class="muted">Entry pool, distributed winnings, and remaining balance.</span>
+        </div>
+        <div id="payoutBoard"></div>
+      </details>
+    </div>
+
+    <div class="section-label">Verification And Audit</div>
+    <div class="card">
+      <details>
+        <summary class="section-summary">Score Rankings</summary>
+        <div class="toolbar">
+          <strong>Average Score Rankings</strong>
+          <span class="muted">Average gross, derived 18-hole handicap, and net-score rank.</span>
+        </div>
+        <div id="scoreRankBoard"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary class="section-summary">Match Details</summary>
+        <div class="toolbar">
+          <strong>Hole-By-Hole Match Detail</strong>
+          <span class="muted">Detailed live segment breakdown for the selected match day.</span>
+        </div>
+        <div id="matchDetailBoard"></div>
+      </details>
+    </div>
+
+    <div class="card" id="workbookAuditCard">
+      <details>
+        <summary class="section-summary">Results Audit</summary>
+        <div class="toolbar">
+          <strong>Results Audit</strong>
+          <span class="muted">Single-table verification for trip finish, average/net rank, scramble, skins, and payouts.</span>
+        </div>
+        <div id="workbookResultsBoard"></div>
+      </details>
+    </div>
+  </div>
+  <nav class="app-bottom-nav" aria-label="Tin Cup Navigation">
+    <a id="bottomNavTrip" class="bottom-nav-link" href="/tin-cup/trip-2026.html">Trip</a>
+    <a id="bottomNavToday" class="bottom-nav-link" href="/tin-cup/today.html">Today</a>
+    <a id="bottomNavScore" class="bottom-nav-link" href="/tin-cup/scorekeeper.html">Score</a>
+    <a id="bottomNavResults" class="bottom-nav-link active" href="/tin-cup/leaderboard-2026.html">Results</a>
+  </nav>
+
+  <script>
+    const TIN_CUP_CONTEXT_STORAGE_KEY = 'tinCupTripContextV1';
+    const LOCAL_KEY = 'tinCupScoringStateV2';
+    const DAY_OPTIONS = ['Day 1', 'Day 2A', 'Day 2B', 'Day 2 Total', 'Day 3', 'Day 4'];
+    const MATCH_DAY_OPTIONS = ['Day 1', 'Day 2A', 'Day 2B', 'Day 3', 'Day 4', 'Practice'];
+    const RANK_POINTS = [12, 10, 8.5, 7, 5.75, 4.5, 3, 1.25, 0, 0, 0, 0, 0, 0, 0, 0];
+    const PLAYERS = ['Matt', 'Rick', 'OB', 'Kyle', 'Manny', 'Steve', 'Tommy', 'Pat', 'Mil', 'Paul O', 'Brian', 'Bob', 'David', 'John', 'Tony', 'Spiro'];
+    const FOURSOMES = [
+      { 'Day 1': ['OB', 'Rick', 'Matt', 'Tommy'], 'Day 2A': ['Paul O', 'Tommy', 'Mil', 'Spiro'], 'Day 2B': ['Tommy', 'Kyle', 'Steve', 'Bob'], 'Day 3': ['Tommy', 'David', 'Tony', 'Brian'], 'Day 4': ['OB', 'Rick', 'Matt', 'Tommy'], Practice: ['OB', 'Rick', 'Matt', 'Tommy'] },
+      { 'Day 1': ['John', 'David', 'Kyle', 'Mil'], 'Day 2A': ['Steve', 'David', 'Rick', 'Manny'], 'Day 2B': ['OB', 'David', 'Pat', 'Spiro'], 'Day 3': ['OB', 'Paul O', 'Kyle', 'Manny'], 'Day 4': ['John', 'David', 'Kyle', 'Mil'], Practice: ['John', 'David', 'Kyle', 'Mil'] },
+      { 'Day 1': ['Tony', 'Steve', 'Pat', 'Paul O'], 'Day 2A': ['Matt', 'Pat', 'Brian', 'Kyle'], 'Day 2B': ['Matt', 'Manny', 'Tony', 'Mil'], 'Day 3': ['John', 'Steve', 'Spiro', 'Matt'], 'Day 4': ['Tony', 'Steve', 'Pat', 'Paul O'], Practice: ['Tony', 'Steve', 'Pat', 'Paul O'] },
+      { 'Day 1': ['Bob', 'Manny', 'Brian', 'Spiro'], 'Day 2A': ['Tony', 'Bob', 'OB', 'John'], 'Day 2B': ['John', 'Rick', 'Paul O', 'Brian'], 'Day 3': ['Mil', 'Pat', 'Bob', 'Rick'], 'Day 4': ['Bob', 'Manny', 'Brian', 'Spiro'], Practice: ['Bob', 'Manny', 'Brian', 'Spiro'] }
+    ];
+
+    const dayBoardEl = document.getElementById('dayBoard');
+    const tripBoardEl = document.getElementById('tripBoard');
+    const selectEl = document.getElementById('daySelect');
+    const refreshEl = document.getElementById('refreshNote');
+    const matchTabsEl = document.getElementById('matchDayTabs');
+    const matchBoardEl = document.getElementById('matchBoard');
+    const strokeBoardEl = document.getElementById('strokeBoard');
+    const scoreRankBoardEl = document.getElementById('scoreRankBoard');
+    const skinsBoardEl = document.getElementById('skinsBoard');
+    const scrambleBoardEl = document.getElementById('scrambleBoard');
+    const sideGamesBoardEl = document.getElementById('sideGamesBoard');
+    const payoutBoardEl = document.getElementById('payoutBoard');
+    const workbookResultsBoardEl = document.getElementById('workbookResultsBoard');
+    const matchDetailBoardEl = document.getElementById('matchDetailBoard');
+    const readableReportEl = document.getElementById('readableReport');
+    const generateReportBtn = document.getElementById('generateReportBtn');
+    const printReportBtn = document.getElementById('printReportBtn');
+    const openWinnersModeBtn = document.getElementById('openWinnersModeBtn');
+    const shareReportBtn = document.getElementById('shareReportBtn');
+    const resultsShortcutScore = document.getElementById('resultsShortcutScore');
+    const resultsShortcutToday = document.getElementById('resultsShortcutToday');
+    const resultsShortcutTrip = document.getElementById('resultsShortcutTrip');
+    const bottomNavTrip = document.getElementById('bottomNavTrip');
+    const bottomNavToday = document.getElementById('bottomNavToday');
+    const bottomNavScore = document.getElementById('bottomNavScore');
+    const bottomNavResults = document.getElementById('bottomNavResults');
+
+    let selectedDay = 'Day 1';
+    let selectedMatchDay = 'Day 1';
+    let tripId = null;
+    let useSecondaryTripDb = false;
+    let contextSource = 'unknown';
+    let latestPayload = null;
+    let autoPrintTriggered = false;
+
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    const norm = (v = '') => String(v || '').trim().replace(/\s+/g, ' ').toLowerCase();
+    const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : null; };
+    const tripApi = (path) => useSecondaryTripDb ? (path.includes('?') ? `${path}&myrtleBeach2026=true` : `${path}?myrtleBeach2026=true`) : path;
+
+    function loadContext() {
+      const qs = new URLSearchParams(window.location.search);
+      const qTrip = String(qs.get('tripId') || '').trim();
+      const qSecondary = String(qs.get('secondary') || '').trim();
+      if (qSecondary === '0' || qSecondary.toLowerCase() === 'false') useSecondaryTripDb = false;
+      if (qSecondary === '1' || qSecondary.toLowerCase() === 'true') useSecondaryTripDb = true;
+      if (qTrip) { tripId = qTrip; contextSource = 'query'; return; }
+      try {
+        const raw = localStorage.getItem(TIN_CUP_CONTEXT_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.tripId) { tripId = String(parsed.tripId); contextSource = 'storage'; }
+        if (parsed && (parsed.secondary === '0' || parsed.secondary === 0 || parsed.secondary === false)) useSecondaryTripDb = false;
+        if (parsed && (parsed.secondary === '1' || parsed.secondary === 1 || parsed.secondary === true)) useSecondaryTripDb = true;
+      } catch (_err) {}
+    }
+
+    function buildTinCupContextHref(path) {
+      if (!tripId) return path;
+      const sep = path.includes('?') ? '&' : '?';
+      return `${path}${sep}tripId=${encodeURIComponent(String(tripId))}&secondary=${useSecondaryTripDb ? '1' : '0'}`;
+    }
+
+    function syncContextLinks() {
+      if (resultsShortcutScore) resultsShortcutScore.href = buildTinCupContextHref('/tin-cup/scorekeeper.html');
+      if (resultsShortcutToday) resultsShortcutToday.href = buildTinCupContextHref('/tin-cup/today.html');
+      if (resultsShortcutTrip) resultsShortcutTrip.href = buildTinCupContextHref('/tin-cup/trip-2026.html');
+      if (bottomNavTrip) bottomNavTrip.href = buildTinCupContextHref('/tin-cup/trip-2026.html');
+      if (bottomNavToday) bottomNavToday.href = buildTinCupContextHref('/tin-cup/today.html');
+      if (bottomNavScore) bottomNavScore.href = buildTinCupContextHref('/tin-cup/scorekeeper.html');
+      if (bottomNavResults) bottomNavResults.href = buildTinCupContextHref('/tin-cup/leaderboard-2026.html');
+    }
+
+    function shouldAutoOpenReadableReport() {
+      const qs = new URLSearchParams(window.location.search);
+      const report = String(qs.get('report') || '').trim().toLowerCase();
+      const print = String(qs.get('print') || '').trim().toLowerCase();
+      return report === '1' || report === 'true' || print === '1' || print === 'true';
+    }
+
+    function shouldAutoPrintReadableReport() {
+      const qs = new URLSearchParams(window.location.search);
+      const print = String(qs.get('print') || '').trim().toLowerCase();
+      return print === '1' || print === 'true';
+    }
+
+    function buildWinnersModeLink(printMode = false) {
+      const base = tripId
+        ? `/tin-cup/winners.html?tripId=${encodeURIComponent(String(tripId))}&secondary=${useSecondaryTripDb ? '1' : '0'}`
+        : '/tin-cup/winners.html';
+      if (!printMode) return base;
+      return `${base}${base.includes('?') ? '&' : '?'}print=1`;
+    }
+
+    function findTinCupTrip(trips) {
+      const list = Array.isArray(trips) ? trips : [];
+      return list.find((t) => /tin\s*cup/i.test(String(t && t.name || '')))
+        || list.find((t) => /tin\s*cup/i.test(String(t && t.groupName || '')))
+        || list.find((t) => /tin\s*cup/i.test(String(t && t.reservationNumber || '')))
+        || list.find((t) => t && t.tinCupLive && typeof t.tinCupLive === 'object')
+        || null;
+    }
+
+    async function discoverTripId() {
+      let res = await fetch(tripApi('/api/trips'));
+      if (res.ok) {
+        const trips = await res.json();
+        const found = findTinCupTrip(trips);
+        if (found && found._id) { tripId = String(found._id); contextSource = useSecondaryTripDb ? 'discover-secondary' : 'discover-primary'; return; }
+      }
+      useSecondaryTripDb = !useSecondaryTripDb;
+      res = await fetch(tripApi('/api/trips'));
+      if (!res.ok) throw new Error(`Trip list request failed (${res.status})`);
+      const trips = await res.json();
+      const found = findTinCupTrip(trips);
+      if (!found || !found._id) throw new Error('Tin Cup trip not found');
+      tripId = String(found._id);
+      contextSource = useSecondaryTripDb ? 'discover-secondary' : 'discover-primary';
+    }
+
+    async function resolveTripId() {
+      if (!tripId) await discoverTripId();
+      return tripId;
+    }
+
+    function defaultLocalState() {
+      return {
+        matchResults: { 'Day 1': {}, 'Day 2A': {}, 'Day 2B': {}, 'Day 3': {}, 'Day 4': {}, Practice: {} },
+        strokeNet: { 'Day 1': {}, 'Day 3': {}, 'Day 4': {} },
+        markerCounts: { ctp: {}, longDrive: {} },
+        scrambleBonus: {},
+        penalties: {}
+      };
+    }
+    function loadLocalState() {
+      try {
+        const raw = localStorage.getItem(LOCAL_KEY);
+        if (!raw) return defaultLocalState();
+        const base = defaultLocalState();
+        const incoming = JSON.parse(raw);
+        return {
+          matchResults: { ...base.matchResults, ...(incoming.matchResults || {}) },
+          strokeNet: { ...base.strokeNet, ...(incoming.strokeNet || {}) },
+          markerCounts: {
+            ctp: { ...(base.markerCounts.ctp || {}), ...((((incoming.markerCounts || {}).ctp) || {})) },
+            longDrive: { ...(base.markerCounts.longDrive || {}), ...((((incoming.markerCounts || {}).longDrive) || {})) }
+          },
+          scrambleBonus: { ...(incoming.scrambleBonus || {}) },
+          penalties: { ...(incoming.penalties || {}) }
+        };
+      } catch (_err) {
+        return defaultLocalState();
+      }
+    }
+    function getLocalMarkerWins(state, type, playerName) {
+      const key = norm(playerName);
+      return Number((((state.markerCounts || {})[type] || {})[key]) || 0);
+    }
+    function buildSharedPayoutMap(rows = [], payoutValues = []) {
+      const out = new Map(PLAYERS.map((name) => [norm(name), 0]));
+      let index = 0;
+      while (index < rows.length && index < payoutValues.length) {
+        const start = index;
+        const position = rows[index].position;
+        while (index < rows.length && rows[index].position === position && index < payoutValues.length) index += 1;
+        const total = payoutValues.slice(start, index).reduce((sum, value) => sum + (num(value) || 0), 0);
+        const avg = index > start ? Math.round(total / (index - start)) : 0;
+        rows.slice(start, index).forEach((row) => out.set(norm(row.name), avg));
+      }
+      return out;
+    }
+    function getLeftoverSuggestion(balance) {
+      const dollars = Math.round(Number(balance || 0));
+      if (dollars <= 0) return '';
+      if (dollars <= 10) return `Suggested use: tip add-on or cash tiebreak bonus for the remaining $${dollars}.`;
+      if (dollars <= 25) return `Suggested use: drinks or a closest-to-the-pin bonus for the remaining $${dollars}.`;
+      if (dollars <= 50) return `Suggested use: final-hole side prize or drinks with the remaining $${dollars}.`;
+      return `Suggested use: drinks, dinner, or next year's side-game pot with the remaining $${dollars}.`;
+    }
+    function buildLocalPayoutSummary(totals = [], state = defaultLocalState()) {
+      const finalPayouts = buildSharedPayoutMap(totals, [1000, 500, 250, 125]);
+      const loserRow = totals.slice().sort((a, b) => (a.total - b.total) || b.name.localeCompare(a.name))[0] || null;
+      const rows = PLAYERS.map((name) => {
+        const key = norm(name);
+        const finalPrize = finalPayouts.get(key) || 0;
+        const ctp = Math.round(getLocalMarkerWins(state, 'ctp', name) * 25);
+        const longDrive = Math.round(getLocalMarkerWins(state, 'longDrive', name) * 25);
+        const loser = loserRow && norm(loserRow.name) === key ? 50 : 0;
+        const total = Math.round(finalPrize + ctp + longDrive + loser);
+        return { name, finalPrize, ctp, longDrive, longPutt: 0, secretSnowman: 0, skins: 0, loser, total };
+      }).filter((row) => row.total > 0)
+        .sort((a, b) => (b.total - a.total) || a.name.localeCompare(b.name));
+      const mainPot = Math.round(200 * PLAYERS.length);
+      const distributed = Math.round(rows.reduce((sum, row) => sum + row.total, 0));
+      const balance = Math.round(mainPot - distributed);
+      return {
+        pot: mainPot,
+        mainPot,
+        skinsPot: 0,
+        distributed,
+        balance,
+        leftoverSuggestion: getLeftoverSuggestion(balance),
+        rows,
+      };
+    }
+    function buildLocalWorkbookResults(totals = [], payouts = { rows: [] }, state = defaultLocalState()) {
+      const payoutByName = new Map((payouts.rows || []).map((row) => [norm(row.name), row]));
+      return totals.map((row) => {
+        const payout = payoutByName.get(norm(row.name)) || {};
+        return {
+          tripPosition: row.position,
+          name: row.name,
+          tripTotal: row.total,
+          averageGross: null,
+          netScore: null,
+          netRank: null,
+          scoreLabel: '',
+          scrambleTeam: '',
+          scrambleTotal: null,
+          scrambleRank: null,
+          scramblePoints: row.scramble || 0,
+          skinsWon: 0,
+          skinsPayout: 0,
+          ctpWins: getLocalMarkerWins(state, 'ctp', row.name),
+          longDriveWins: getLocalMarkerWins(state, 'longDrive', row.name),
+          longPuttWins: 0,
+          secretSnowmanWins: 0,
+          loser: Number(payout.loser || 0) > 0,
+          finalPrize: Number(payout.finalPrize || 0),
+          payoutTotal: Number(payout.total || 0),
+        };
+      });
+    }
+    function getDayMatrixByPlayer(dayKey) {
+      if (String(dayKey || '').trim() === 'Practice') return new Map();
+      const rules = [{ pairs: [[0, 1], [2, 3]] }, { pairs: [[0, 2], [1, 3]] }, { pairs: [[0, 3], [1, 2]] }];
+      const rows = [];
+      FOURSOMES.forEach((group) => {
+        const players = group[dayKey] || [];
+        if (players.length < 4) return;
+        const by = new Map(players.map((p) => [norm(p), { player: p, segments: [] }]));
+        rules.forEach((rule) => {
+          rule.pairs.forEach(([a, b]) => {
+            by.get(norm(players[a])).segments.push({ opponent: players[b] });
+            by.get(norm(players[b])).segments.push({ opponent: players[a] });
+          });
+        });
+        players.forEach((p) => rows.push(by.get(norm(p))));
+      });
+      return new Map(rows.map((r) => [norm(r.player), r]));
+    }
+    function getMatchPoints(state, dayKey) {
+      const matrix = getDayMatrixByPlayer(dayKey);
+      const out = new Map(PLAYERS.map((p) => [norm(p), 0]));
+      matrix.forEach((row, key) => {
+        let points = 0;
+        (row.segments || []).forEach((_segment, idx) => {
+          const v = String((((state.matchResults || {})[dayKey] || {})[key] || {})[idx] || '').trim().toUpperCase();
+          if (v === 'W') points += 2;
+          else if (v === 'T') points += 1;
+        });
+        out.set(key, points);
+      });
+      return out;
+    }
+    function getStrokeBonus(state, dayKey) {
+      const values = PLAYERS.map((p) => ({ key: norm(p), value: num((((state.strokeNet || {})[dayKey] || {})[norm(p)])) }));
+      const valid = values.filter((v) => v.value !== null);
+      const out = new Map(values.map((v) => [v.key, 0]));
+      valid.forEach((entry) => {
+        const rank = 1 + valid.filter((v) => v.value < entry.value).length;
+        if (rank < 9) out.set(entry.key, 2);
+      });
+      return out;
+    }
+    function getDay4RankPoints(state) {
+      const entries = PLAYERS.map((p) => ({ key: norm(p), net: num((((state.strokeNet || {})['Day 4'] || {})[norm(p)])) }))
+        .filter((e) => e.net !== null).sort((a, b) => a.net - b.net);
+      const pts = new Map(PLAYERS.map((p) => [norm(p), 0]));
+      const ranks = new Map(PLAYERS.map((p) => [norm(p), null]));
+      let i = 0;
+      while (i < entries.length) {
+        const start = i;
+        const score = entries[i].net;
+        while (i < entries.length && entries[i].net === score) i += 1;
+        const tie = entries.slice(start, i);
+        const first = start + 1;
+        let total = 0;
+        for (let pos = first; pos <= i; pos += 1) total += (RANK_POINTS[pos - 1] || 0);
+        const avg = tie.length ? Number((total / tie.length).toFixed(2)) : 0;
+        tie.forEach((t) => { pts.set(t.key, avg); ranks.set(t.key, first); });
+      }
+      return { pts, ranks };
+    }
+    function computeTotals(state) {
+      const d1 = getMatchPoints(state, 'Day 1');
+      const d2a = getMatchPoints(state, 'Day 2A');
+      const d2b = getMatchPoints(state, 'Day 2B');
+      const d3 = getMatchPoints(state, 'Day 3');
+      const s1 = getStrokeBonus(state, 'Day 1');
+      const s3 = getStrokeBonus(state, 'Day 3');
+      const d4 = getDay4RankPoints(state);
+      const rows = PLAYERS.map((name) => {
+        const key = norm(name);
+        const match1 = d1.get(key) || 0;
+        const match2A = d2a.get(key) || 0;
+        const match2B = d2b.get(key) || 0;
+        const match2 = match2A + match2B;
+        const match3 = d3.get(key) || 0;
+        const stroke1 = s1.get(key) || 0;
+        const stroke3 = s3.get(key) || 0;
+        const scramble = num((state.scrambleBonus || {})[key]) || 0;
+        const penaltyTotal = num((((state.penalties || {})[key] || {}).total)) || 0;
+        const day4Points = d4.pts.get(key) || 0;
+        const day1Total = match1 + stroke1;
+        const day2Total = match2;
+        const day3Total = match3 + stroke3 + scramble;
+        const total = Number((day1Total + day2Total + day3Total + day4Points).toFixed(2));
+        const day1Net = num((((state.strokeNet || {})['Day 1'] || {})[key]));
+        const day3Net = num((((state.strokeNet || {})['Day 3'] || {})[key]));
+        const day4Net = num((((state.strokeNet || {})['Day 4'] || {})[key]));
+        return { name, day1Gross: null, day3Gross: null, day4Gross: null, day1Net, day3Net, day4Net, match1, match2A, match2B, match2, match3, stroke1, stroke3, scramble, penaltyTotal, day4Points, day4Rank: d4.ranks.get(key), day1Total, day2Total, day3Total, total };
+      }).sort((a, b) => (b.total - a.total) || a.name.localeCompare(b.name));
+      let pos = 0; let last = null;
+      rows.forEach((r, idx) => { if (last === null || r.total !== last) pos = idx + 1; r.position = pos; last = r.total; });
+      return rows;
+    }
+
+    function fetchDayRows(totals, dayKey) {
+      const rows = totals.map((row) => {
+        let points = 0; let detail = '';
+        if (dayKey === 'Day 1') { points = row.day1Total; detail = `${row.match1} match + ${row.stroke1} stroke`; }
+        else if (dayKey === 'Day 2A') { points = row.match2A; detail = `${points} match`; }
+        else if (dayKey === 'Day 2B') { points = row.match2B; detail = `${points} match`; }
+        else if (dayKey === 'Day 2 Total') { points = row.day2Total; detail = `${row.day2Total} match`; }
+        else if (dayKey === 'Day 3') { points = row.day3Total; detail = `${row.match3} match + ${row.stroke3} stroke + ${row.scramble} scramble`; }
+        else { points = row.day4Points || 0; detail = `${points} rank pts`; }
+        if (Number(row.penaltyTotal || 0) !== 0) detail = `${detail} + pen +${row.penaltyTotal}`;
+        return { name: row.name, points, detail, total: row.total };
+      }).sort((a, b) => (b.points - a.points) || (b.total - a.total) || a.name.localeCompare(b.name));
+      let pos = 0; let last = null;
+      rows.forEach((r, idx) => { if (last === null || r.points !== last) pos = idx + 1; r.position = pos; last = r.points; });
+      return rows;
+    }
+
+    function fetchMatchRows(state, dayKey) {
+      const matrix = getDayMatrixByPlayer(dayKey);
+      return Array.from(matrix.values()).map((row) => {
+        const key = norm(row.player);
+        let points = 0;
+        const segments = (row.segments || []).map((segment, idx) => {
+          const result = String((((state.matchResults || {})[dayKey] || {})[key] || {})[idx] || '').trim().toUpperCase();
+          if (result === 'W') points += 2;
+          else if (result === 'T') points += 1;
+          return { opponent: segment.opponent, result, segmentIndex: idx };
+        });
+        return { player: row.player, points, segments };
+      });
+    }
+
+    async function fetchApiLeaderboardForCurrentDb() {
+      const id = await resolveTripId();
+      const q = new URLSearchParams({ day: selectedDay, matchDay: selectedMatchDay }).toString();
+      const url = tripApi(`/api/trips/${id}/tin-cup/live/leaderboard?${q}`);
+      const res = await fetch(url);
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || `Leaderboard request failed (${res.status})`);
+      }
+      return res.json();
+    }
+
+    async function fetchApiLeaderboard() {
+      try {
+        return await fetchApiLeaderboardForCurrentDb();
+      } catch (error) {
+        const message = String((error && error.message) || '');
+        if (!tripId || !/trip not found/i.test(message)) throw error;
+        useSecondaryTripDb = !useSecondaryTripDb;
+        contextSource = useSecondaryTripDb ? 'retry-secondary' : 'retry-primary';
+        return fetchApiLeaderboardForCurrentDb();
+      }
+    }
+
+    function renderMatchTabs(options = []) {
+      matchTabsEl.innerHTML = options.map((day) => {
+        const active = day === selectedMatchDay ? ' active' : '';
+        return `<button class="tab-btn${active}" type="button" data-match-day="${esc(day)}">${esc(day)}</button>`;
+      }).join('');
+    }
+
+    function renderMatchRows(rows = []) {
+      if (!rows.length) { matchBoardEl.innerHTML = '<div class="muted">No live match data for this day yet.</div>'; return; }
+      const body = rows.map((row) => {
+        const segments = Array.isArray(row.segments) ? row.segments : [];
+        const c0 = segments[0] || {}; const c1 = segments[1] || {}; const c2 = segments[2] || {};
+        const cell = (s) => `${esc(s.opponent || '-')}<span class="match-result">${esc(s.result || '-')}</span>`;
+        return `<tr><td><strong>${esc(row.player || '')}</strong></td><td>${cell(c0)}</td><td>${cell(c1)}</td><td>${cell(c2)}</td><td><strong>${esc(row.points ?? 0)}</strong></td></tr>`;
+      }).join('');
+      matchBoardEl.innerHTML = `<table><thead><tr><th>Player</th><th>Front 9</th><th>Back 9 #1</th><th>Back 9 #2</th><th>Match Pts</th></tr></thead><tbody>${body}</tbody></table>`;
+    }
+
+    function renderDayRows(dayKey, rows = []) {
+      dayBoardEl.innerHTML = `<table><thead><tr><th>Pos</th><th>Player</th><th>${esc(dayKey)} Pts</th><th>Breakdown</th><th>Trip Total</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.position)}</td><td><strong>${esc(r.name)}</strong></td><td><strong>${esc(r.points)}</strong></td><td>${esc(r.detail)}</td><td>${esc(r.total)}</td></tr>`).join('')}</tbody></table>`;
+    }
+
+    function renderTripRows(rows = []) {
+      tripBoardEl.innerHTML = `<table><thead><tr><th>Pos</th><th>Player</th><th>D1 Match</th><th>D1 Stroke</th><th>D2 Match</th><th>D3 Match</th><th>D3 Stroke</th><th>Scramble</th><th>Penalty</th><th>D4 Rank Pts</th><th>Total</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.position)}</td><td><strong>${esc(r.name)}</strong></td><td>${esc(r.match1)}</td><td>${esc(r.stroke1)}</td><td>${esc(r.match2)}</td><td>${esc(r.match3)}</td><td>${esc(r.stroke3)}</td><td>${esc(r.scramble)}</td><td>${esc(Number(r.penaltyTotal || 0).toFixed(2))}</td><td>${esc(r.day4Points)}${Number.isInteger(r.day4Rank) ? ` <span class="muted">(r${esc(r.day4Rank)})</span>` : ''}</td><td><strong>${esc(r.total)}</strong></td></tr>`).join('')}</tbody></table>`;
+    }
+
+    function renderStrokeRows(rows = []) {
+      if (!rows.length) {
+        strokeBoardEl.innerHTML = '<div class="muted">No stroke results yet.</div>';
+        return;
+      }
+      strokeBoardEl.innerHTML = `<table><thead><tr><th>Player</th><th>Day 1 Gross</th><th>Day 1 Net</th><th>Day 3 Gross</th><th>Day 3 Net</th><th>Day 4 Gross</th><th>Day 4 Net</th><th>Scramble</th><th>Day 1 Stroke Pts</th><th>Day 3 Stroke Pts</th><th>Day 4 Rank Pts</th></tr></thead><tbody>${rows.map((r) => `<tr><td><strong>${esc(r.name)}</strong></td><td>${r.day1Gross === null || r.day1Gross === undefined ? '-' : esc(r.day1Gross)}</td><td>${r.day1Net === null || r.day1Net === undefined ? '-' : esc(r.day1Net)}</td><td>${r.day3Gross === null || r.day3Gross === undefined ? '-' : esc(r.day3Gross)}</td><td>${r.day3Net === null || r.day3Net === undefined ? '-' : esc(r.day3Net)}</td><td>${r.day4Gross === null || r.day4Gross === undefined ? '-' : esc(r.day4Gross)}</td><td>${r.day4Net === null || r.day4Net === undefined ? '-' : esc(r.day4Net)}</td><td>${r.scramble === null || r.scramble === undefined ? '-' : esc(r.scramble)}</td><td>${esc(r.stroke1 || 0)}</td><td>${esc(r.stroke3 || 0)}</td><td>${esc(r.day4Points || 0)}${Number.isInteger(r.day4Rank) ? ` <span class="muted">(r${esc(r.day4Rank)})</span>` : ''}</td></tr>`).join('')}</tbody></table>`;
+    }
+
+    function renderScoreRankings(rows = []) {
+      if (!rows.length) {
+        scoreRankBoardEl.innerHTML = '<div class="muted">No average-score rankings yet.</div>';
+        return;
+      }
+      scoreRankBoardEl.innerHTML = `<table><thead><tr><th>Pos</th><th>Player</th><th>Avg Gross</th><th>18-Hole HC</th><th>Net Score</th><th>Rounds</th><th>Label</th></tr></thead><tbody>${rows.map((row) => `<tr><td>${esc(row.position)}</td><td><strong>${esc(row.name)}</strong></td><td>${esc(row.averageGross)}</td><td>${esc(row.handicap18)}</td><td>${esc(row.netScore)}</td><td>${esc(row.roundsPlayed)}</td><td>${esc(row.label || '')}</td></tr>`).join('')}</tbody></table>`;
+    }
+
+    function renderSkins(payload = {}) {
+      const totals = Array.isArray(payload.totals) ? payload.totals : [];
+      const days = Array.isArray(payload.days) ? payload.days : [];
+      const summary = totals.length
+        ? `<table><thead><tr><th>Player</th><th>Skins</th><th>Payout</th></tr></thead><tbody>${totals.map((row) => `<tr><td><strong>${esc(row.name)}</strong></td><td>${esc(row.skins)}</td><td>${esc(Number(row.payout || 0).toFixed(2))}</td></tr>`).join('')}</tbody></table>`
+        : '<div class="muted">No skins have been won yet.</div>';
+      const daySummary = days.map((day) => `<span class="muted" style="display:inline-block;margin-right:10px;">${esc(day.dayKey)}: ${esc(day.skinCount || 0)} skins, pot ${esc(Number(day.pot || 0).toFixed(2))}</span>`).join('');
+      skinsBoardEl.innerHTML = `${daySummary ? `<div style="margin-bottom:10px;">${daySummary}</div>` : ''}${summary}`;
+    }
+
+    function renderScramble(payload = {}) {
+      const teams = Array.isArray(payload.teams) ? payload.teams : [];
+      if (!teams.length) {
+        scrambleBoardEl.innerHTML = '<div class="muted">No scramble teams available.</div>';
+        return;
+      }
+      const incompleteTeams = teams.filter((team) => Number(team.played || 0) < 18).length;
+      const note = incompleteTeams
+        ? `<div class="table-note warn">Scramble incomplete: ${incompleteTeams} team${incompleteTeams === 1 ? '' : 's'} still need holes entered before the scramble results are final.</div>`
+        : '<div class="table-note ready">Scramble complete: all team totals are in and scramble points are final.</div>';
+      scrambleBoardEl.innerHTML = `${note}<table><thead><tr><th>Team</th><th>Players</th><th>Played</th><th>Total</th><th>Rank</th><th>Points</th></tr></thead><tbody>${teams.map((team) => `<tr><td><strong>${esc(team.label)}</strong></td><td>${esc((team.players || []).join(', '))}</td><td>${esc(team.played || 0)}</td><td>${team.total === null || team.total === undefined ? '-' : esc(team.total)}</td><td>${team.rank ? esc(team.rank) : '-'}</td><td>${esc(team.points || 0)}</td></tr>`).join('')}</tbody></table>`;
+    }
+
+    function renderSideGames(payload = {}) {
+      const sections = ['longPutt', 'secretSnowman'].map((key) => {
+        const section = payload[key] || {};
+        const days = Array.isArray(section.days) ? section.days : [];
+        const totals = Array.isArray(section.totals) ? section.totals : [];
+        const rows = days.length
+          ? `<table><thead><tr><th>${esc(section.label || key)}</th><th>Winner</th></tr></thead><tbody>${days.map((row) => `<tr><td><strong>${esc(row.dayKey)}</strong></td><td>${esc(row.winner || '-')}</td></tr>`).join('')}</tbody></table>`
+          : '<div class="muted">No side-game winners recorded.</div>';
+        const summary = totals.length ? `<div class="muted" style="margin-top:8px;">${totals.map((row) => `${esc(row.name)} (${esc(row.wins)})`).join(' | ')}</div>` : '';
+        return `<div style="margin-bottom:12px;">${rows}${summary}</div>`;
+      }).join('');
+      sideGamesBoardEl.innerHTML = sections || '<div class="muted">No side-game winners recorded.</div>';
+    }
+
+    function renderWorkbookResults(rows = []) {
+      if (!rows.length) {
+        workbookResultsBoardEl.innerHTML = '<div class="muted">No workbook-style result rows are available yet.</div>';
+        return;
+      }
+      const body = rows.map((row) => {
+        const avgText = row.averageGross === null || row.averageGross === undefined
+          ? '-'
+          : `${esc(row.averageGross)}${row.netScore === null || row.netScore === undefined ? '' : ` <span class="muted">(net ${esc(row.netScore)}, r${esc(row.netRank || '-')})</span>`}`;
+        const scrambleText = row.scrambleTeam
+          ? `${esc(row.scrambleTeam)} <span class="muted">(${row.scrambleTotal === null || row.scrambleTotal === undefined ? '-' : esc(row.scrambleTotal)}, r${row.scrambleRank ? esc(row.scrambleRank) : '-'}, ${esc(row.scramblePoints || 0)} pts)</span>`
+          : '-';
+        const labelText = row.scoreLabel ? ` <span class="muted">(${esc(row.scoreLabel)})</span>` : '';
+        const markersText = `CTP ${esc(row.ctpWins || 0)} / LD ${esc(row.longDriveWins || 0)}${row.loser ? ' <span class="muted">/ loser</span>' : ''}`;
+        const sideGameText = `LP ${esc(row.longPuttWins || 0)} / SS ${esc(row.secretSnowmanWins || 0)}`;
+        return `<tr><td>${esc(row.tripPosition)}</td><td><strong>${esc(row.name)}</strong>${labelText}</td><td><strong>${esc(row.tripTotal)}</strong></td><td>${avgText}</td><td>${row.netRank ? esc(row.netRank) : '-'}</td><td>${scrambleText}</td><td>${esc(row.skinsWon || 0)}<span class="muted"> (${esc(Number(row.skinsPayout || 0).toFixed(2))})</span></td><td>${markersText}</td><td>${sideGameText}</td><td>${esc(Number(row.finalPrize || 0).toFixed(2))}</td><td><strong>${esc(Number(row.payoutTotal || 0).toFixed(2))}</strong></td></tr>`;
+      }).join('');
+      workbookResultsBoardEl.innerHTML = `<table><thead><tr><th>Trip Pos</th><th>Player</th><th>Trip Total</th><th>Avg Gross</th><th>Net Rank</th><th>Scramble</th><th>Skins</th><th>Markers</th><th>Side Games</th><th>Final</th><th>Total Payout</th></tr></thead><tbody>${body}</tbody></table>`;
+    }
+
+    function renderPayouts(payload = {}) {
+      const rows = Array.isArray(payload.rows) ? payload.rows : [];
+      const summary = `<div class="muted" style="margin-bottom:10px;">Combined Pot ${esc(Math.round(Number(payload.pot || 0)))} | Entry Pot ${esc(Math.round(Number(payload.mainPot || 0)))} | Skins Pot ${esc(Math.round(Number(payload.skinsPot || 0)))} | Distributed ${esc(Math.round(Number(payload.distributed || 0)))} | Balance ${esc(Math.round(Number(payload.balance || 0)))}</div>${payload.leftoverSuggestion ? `<div class="muted" style="margin-bottom:10px;">${esc(payload.leftoverSuggestion)}</div>` : ''}`;
+      if (!rows.length) {
+        payoutBoardEl.innerHTML = `${summary}<div class="muted">No payouts have been generated yet.</div>`;
+        return;
+      }
+      payoutBoardEl.innerHTML = `${summary}<table><thead><tr><th>Player</th><th>Final</th><th>CTP</th><th>Long Drive</th><th>Long Putt</th><th>Secret Snowman</th><th>Skins</th><th>Loser</th><th>Total</th></tr></thead><tbody>${rows.map((row) => `<tr><td><strong>${esc(row.name)}</strong></td><td>${esc(Math.round(Number(row.finalPrize || 0)))}</td><td>${esc(Math.round(Number(row.ctp || 0)))}</td><td>${esc(Math.round(Number(row.longDrive || 0)))}</td><td>${esc(Math.round(Number(row.longPutt || 0)))}</td><td>${esc(Math.round(Number(row.secretSnowman || 0)))}</td><td>${esc(Math.round(Number(row.skins || 0)))}</td><td>${esc(Math.round(Number(row.loser || 0)))}</td><td><strong>${esc(Math.round(Number(row.total || 0)))}</strong></td></tr>`).join('')}</tbody></table>`;
+    }
+
+    function renderMatchDetails(groups = []) {
+      if (!groups.length) {
+        matchDetailBoardEl.innerHTML = '<div class="muted">No detailed match view for this day yet.</div>';
+        return;
+      }
+      matchDetailBoardEl.innerHTML = groups.map((group) => `<div style="margin-bottom:14px;border:1px solid var(--line);border-radius:12px;padding:10px;">
+        <div style="font-weight:700;margin-bottom:8px;">${esc(group.label)}: ${esc((group.players || []).join(', '))}</div>
+        ${(group.segments || []).map((segment) => `<div style="margin-bottom:10px;">
+          <div class="muted" style="margin-bottom:6px;">${esc(segment.label)}</div>
+          <table><thead><tr><th>Match</th><th>Result</th><th>Hole Snapshots</th></tr></thead><tbody>${(segment.matches || []).map((match) => `<tr><td><strong>${esc(match.left)}</strong> vs <strong>${esc(match.right)}</strong></td><td>${esc(match.result || '-')}</td><td>${esc((match.holes || []).filter((hole) => hole.leftNet !== null && hole.rightNet !== null).map((hole) => `H${hole.hole}:${hole.leftNet}-${hole.rightNet}`).join(' | ') || '-')}</td></tr>`).join('')}</tbody></table>
+        </div>`).join('')}
+      </div>`).join('');
+    }
+
+    function currency(v) {
+      const n = Number(v || 0);
+      return `$${Math.round(n)}`;
+    }
+
+    function renderReadableReport(payload = {}) {
+      const totals = Array.isArray(payload.totals) ? payload.totals : [];
+      const payouts = payload.payouts || {};
+      const sideGames = payload.sideGames || {};
+      const skins = payload.skins || {};
+      const scramble = payload.scramble || {};
+      if (!totals.length) {
+        readableReportEl.innerHTML = '<div class="report-empty">No final report is available until results have been entered.</div>';
+        return;
+      }
+      const topFive = totals.slice(0, 5);
+      const payoutRows = Array.isArray(payouts.rows) ? payouts.rows.slice(0, 8) : [];
+      const scrambleRows = Array.isArray(scramble.teams) ? scramble.teams.filter((team) => team.rank !== null).sort((a, b) => (a.rank - b.rank) || a.label.localeCompare(b.label)) : [];
+      const skinRows = Array.isArray(skins.totals) ? skins.totals.slice(0, 8) : [];
+      const longPuttDays = (((sideGames.longPutt || {}).days) || []).filter((row) => row && row.winner);
+      const snowmanDays = (((sideGames.secretSnowman || {}).days) || []).filter((row) => row && row.winner);
+      const winner = topFive[0] || null;
+      const runnerUp = topFive[1] || null;
+      const payoutLeader = payoutRows[0] || null;
+      const skinLeader = skinRows[0] || null;
+      const generatedAt = new Date().toLocaleString();
+      const sideGameLines = []
+        .concat(longPuttDays.map((row) => `Long Putt ${row.dayKey}: ${row.winner}`))
+        .concat(snowmanDays.map((row) => `Secret Snowman ${row.dayKey}: ${row.winner}`));
+      readableReportEl.innerHTML = `
+        <div class="report-shell">
+          <div class="report-head">
+            <div>
+              <h3>Final Competition Report</h3>
+              <div class="muted">Compact summary of winners, payouts, and scoring proof from the saved Tin Cup competition.</div>
+            </div>
+            <div class="report-meta">
+              <div>Generated: ${esc(generatedAt)}</div>
+              <div>Players: ${esc(totals.length)}</div>
+            </div>
+          </div>
+          <div class="report-highlights">
+            <div class="report-stat">
+              <div class="report-stat-label">Champion</div>
+              <div class="report-stat-value">${winner ? esc(winner.name) : '-'}</div>
+            </div>
+            <div class="report-stat">
+              <div class="report-stat-label">Runner-Up</div>
+              <div class="report-stat-value">${runnerUp ? esc(runnerUp.name) : '-'}</div>
+            </div>
+            <div class="report-stat">
+              <div class="report-stat-label">Top Payout</div>
+              <div class="report-stat-value">${payoutLeader ? `${esc(payoutLeader.name)} ${currency(payoutLeader.total)}` : '-'}</div>
+            </div>
+            <div class="report-stat">
+              <div class="report-stat-label">Top Skins</div>
+              <div class="report-stat-value">${skinLeader ? `${esc(skinLeader.name)} (${esc(skinLeader.skins)})` : '-'}</div>
+            </div>
+          </div>
+          <div class="report-block">
+            <h3>Final Standings</h3>
+            <div class="report-standings">${topFive.map((row, index) => `<div class="report-place"><div class="report-place-rank">${esc(index + 1)}${index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'} Place</div><div class="report-place-name">${esc(row.name)}</div><div class="report-place-value">${esc(row.total)} points</div></div>`).join('')}</div>
+          </div>
+          <div class="report-grid">
+            <div class="report-block">
+              <h3>Prize Winners</h3>
+              ${payoutRows.length ? `<ul class="report-list">${payoutRows.map((row) => `<li><strong>${esc(row.name)}</strong> - ${currency(row.total)}</li>`).join('')}</ul>` : '<div class="report-empty">No payouts recorded yet.</div>'}
+            </div>
+            <div class="report-block">
+              <h3>Scramble Results</h3>
+              ${scrambleRows.length ? `<ul class="report-list">${scrambleRows.map((team) => `<li><strong>${esc(team.label)}</strong> - ${team.total === null ? '-' : esc(team.total)} total, ${esc(team.points || 0)} pts</li>`).join('')}</ul>` : '<div class="report-empty">No scramble results recorded yet.</div>'}
+            </div>
+          </div>
+          <div class="report-grid">
+            <div class="report-block">
+              <h3>Side Games</h3>
+              ${sideGameLines.length ? `<ul class="report-list">${sideGameLines.map((line) => `<li>${esc(line)}</li>`).join('')}</ul>` : '<div class="report-empty">No side-game winners yet.</div>'}
+            </div>
+            <div class="report-block">
+              <h3>Skins Summary</h3>
+              ${skinRows.length ? `<ul class="report-list">${skinRows.map((row) => `<li><strong>${esc(row.name)}</strong> - ${esc(row.skins)} skins, ${currency(row.payout)}</li>`).join('')}</ul>` : '<div class="report-empty">No skins winners yet.</div>'}
+            </div>
+          </div>
+          <div class="report-block">
+            <h3>Scoring Proof</h3>
+            <div class="report-proof">
+              <div>Standings come directly from saved live scorecards, scramble team scores, markers, and penalty settings.</div>
+              <div>Stroke results show both gross and net values for Day 1, Day 3, and Day 4.</div>
+              <div>Match points, scramble points, skins, side games, and payouts can be cross-checked in the detailed sections below this report.</div>
+              <div>Use Workbook Results Audit and Stroke Results together when presenting the fairness of the final results.</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFromPayload(payload) {
+      latestPayload = payload;
+      syncContextLinks();
+      const dayOptions = Array.isArray(payload.dayOptions) ? payload.dayOptions : DAY_OPTIONS.slice();
+      const matchOptions = Array.isArray(payload.matchDayOptions) ? payload.matchDayOptions : MATCH_DAY_OPTIONS.slice();
+      if (!dayOptions.includes(selectedDay)) selectedDay = dayOptions[0];
+      if (!matchOptions.includes(selectedMatchDay)) selectedMatchDay = matchOptions[0];
+      if (!selectEl.options.length || selectEl.options.length !== dayOptions.length) {
+        selectEl.innerHTML = dayOptions.map((day) => `<option value="${esc(day)}">${esc(day)}</option>`).join('');
+      }
+      selectEl.value = selectedDay;
+      renderMatchTabs(matchOptions);
+      renderMatchRows(payload.matchRows || []);
+      renderDayRows(selectedDay, payload.dayRows || []);
+      renderTripRows(payload.totals || []);
+      renderStrokeRows(payload.totals || []);
+      renderScoreRankings(payload.scoreRankings || []);
+      renderSkins(payload.skins || {});
+      renderScramble(payload.scramble || {});
+      renderSideGames(payload.sideGames || {});
+      renderWorkbookResults(payload.workbookResults || []);
+      renderPayouts(payload.payouts || {});
+      renderMatchDetails(payload.matchDetailRows || payload.matchDetails && payload.matchDetails[selectedMatchDay] || []);
+      renderReadableReport(payload);
+      if (shouldAutoOpenReadableReport()) {
+        const reportCard = document.getElementById('readable-report');
+        const details = reportCard ? reportCard.querySelector('details') : null;
+        if (details) details.open = true;
+      }
+      refreshEl.textContent = `Last refresh: ${new Date().toLocaleTimeString()}${contextSource === 'local-fallback' ? ' (local fallback)' : ''}`;
+      if (shouldAutoPrintReadableReport() && !autoPrintTriggered) {
+        autoPrintTriggered = true;
+        window.setTimeout(() => window.print(), 150);
+      }
+    }
+
+    function renderLocalFallback() {
+      contextSource = 'local-fallback';
+      const state = loadLocalState();
+      const totals = computeTotals(state);
+      const payouts = buildLocalPayoutSummary(totals, state);
+      const payload = {
+        dayOptions: DAY_OPTIONS,
+        matchDayOptions: MATCH_DAY_OPTIONS,
+        matchRows: fetchMatchRows(state, selectedMatchDay),
+        dayRows: fetchDayRows(totals, selectedDay),
+        totals,
+        scoreRankings: [],
+        skins: { days: [], totals: [] },
+        scramble: { teams: [] },
+        sideGames: {},
+        payouts,
+        workbookResults: buildLocalWorkbookResults(totals, payouts, state),
+        matchDetailRows: [],
+      };
+      renderFromPayload(payload);
+    }
+
+    async function render() {
+      try {
+        const payload = await fetchApiLeaderboard();
+        renderFromPayload(payload);
+      } catch (error) {
+        const message = (error && error.message) ? error.message : 'Failed to load leaderboard';
+        if (/tin cup trip not found|trip not found/i.test(message)) {
+          renderLocalFallback();
+          return;
+        }
+        dayBoardEl.innerHTML = `<div class="muted">${esc(message)}</div>`;
+        tripBoardEl.innerHTML = '';
+        matchBoardEl.innerHTML = '';
+        strokeBoardEl.innerHTML = '';
+        scoreRankBoardEl.innerHTML = '';
+        skinsBoardEl.innerHTML = '';
+        scrambleBoardEl.innerHTML = '';
+        sideGamesBoardEl.innerHTML = '';
+        workbookResultsBoardEl.innerHTML = '';
+        payoutBoardEl.innerHTML = '';
+        matchDetailBoardEl.innerHTML = '';
+      }
+    }
+
+    selectEl.addEventListener('change', () => {
+      selectedDay = String(selectEl.value || 'Day 1');
+      render();
+    });
+
+    matchTabsEl.addEventListener('click', (event) => {
+      const btn = event.target.closest('[data-match-day]');
+      if (!btn) return;
+      selectedMatchDay = String(btn.dataset.matchDay || '').trim();
+      render();
+    });
+
+    document.addEventListener('click', (event) => {
+      const btn = event.target.closest('[data-view-target]');
+      if (!btn) return;
+      const target = document.getElementById(String(btn.dataset.viewTarget || '').trim());
+      if (!target) return;
+      document.querySelectorAll('[data-view-target]').forEach((node) => node.classList.toggle('active', node === btn));
+      const details = target.querySelector('details');
+      if (details) details.open = true;
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    generateReportBtn.addEventListener('click', () => {
+      renderReadableReport(latestPayload || {});
+    });
+
+    printReportBtn.addEventListener('click', () => {
+      if (!latestPayload) renderReadableReport({});
+      window.print();
+    });
+
+    openWinnersModeBtn.addEventListener('click', () => {
+      window.open(buildWinnersModeLink(false), '_blank', 'noopener');
+    });
+
+    shareReportBtn.addEventListener('click', async () => {
+      if (!latestPayload) renderReadableReport({});
+      const totals = Array.isArray((latestPayload || {}).totals) ? latestPayload.totals.slice(0, 3) : [];
+      const payouts = Array.isArray(((latestPayload || {}).payouts || {}).rows) ? latestPayload.payouts.rows.slice(0, 3) : [];
+      const text = [
+        'Tin Cup Winners Summary',
+        ...totals.map((row, index) => `${index + 1}. ${row.name} - ${row.total} pts`),
+        payouts.length ? `Top payout: ${payouts[0].name} - $${Math.round(Number(payouts[0].total || 0))}` : ''
+      ].filter(Boolean).join('\n');
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: 'Tin Cup Winners Summary', text, url: window.location.href });
+          return;
+        }
+      } catch (_err) {}
+      try {
+        await navigator.clipboard.writeText(text);
+        if (refreshEl) refreshEl.textContent = 'Winners summary copied';
+      } catch (_err) {
+        if (refreshEl) refreshEl.textContent = 'Share unavailable';
+      }
+    });
+
+    loadContext();
+    syncContextLinks();
+    setInterval(render, 5000);
+    render();
+  </script>
+</body>
+</html>
+

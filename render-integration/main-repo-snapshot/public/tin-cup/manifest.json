@@ -1,0 +1,74 @@
+{
+  "id": "/tin-cup/trip-2026.html?source=pwa",
+  "name": "Tin Cup 2026",
+  "short_name": "Tin Cup",
+  "description": "Mobile-friendly Tin Cup trip schedules, score entry, leaderboard, lodging, and admin tools.",
+  "start_url": "/tin-cup/trip-2026.html?source=pwa",
+  "scope": "/tin-cup/",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
+  ],
+  "background_color": "#112417",
+  "theme_color": "#173224",
+  "orientation": "any",
+  "categories": [
+    "sports",
+    "travel",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/assets/tin-cup.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/tin-cup.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tin Cup Today",
+      "short_name": "Today",
+      "url": "/tin-cup/today.html",
+      "icons": [
+        {
+          "src": "/assets/tin-cup.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Tin Cup Score",
+      "short_name": "Score",
+      "url": "/tin-cup/scorekeeper.html",
+      "icons": [
+        {
+          "src": "/assets/tin-cup.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Tin Cup Results",
+      "short_name": "Results",
+      "url": "/tin-cup/leaderboard-2026.html",
+      "icons": [
+        {
+          "src": "/assets/tin-cup.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

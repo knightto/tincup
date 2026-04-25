@@ -1,0 +1,46 @@
+{
+    "name": "tee-time",
+    "version": "3.11.0",
+    "private": true,
+    "type": "commonjs",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js",
+        "build:frontend": "node scripts/generate_sw_assets.js && node scripts/build_frontend.js",
+        "gen:sw-assets": "node scripts/generate_sw_assets.js",
+        "test": "node tests/test_add_tee.js && node tests/test_server_helpers.js && node tests/test_outings_registration_modes.js && node tests/test_club_cancel_recipients.js && node tests/test_render_order.js && node tests/test_handicap_import.js && node tests/test_trip_competition_service.js && node tests/test_trip_ryder_cup_service.js && node tests/test_tin_cup_live_service.js && node tests/test_masters_pool_service.js",
+        "test:e2e": "node tests/e2e_smoke.js && node tests/e2e_browser_smoke.js && node tests/e2e_public_mobile_header.js && node tests/e2e_public_event_layout.js && node tests/e2e_mobile_skins_pops.js && node tests/e2e_tin_cup_browser.js && node tests/e2e_plastered_open_browser.js",
+        "test:reset": "node scripts/reset_test_data.js",
+        "test:frontend": "node tests/test_add_tee.js",
+        "test:server": "node tests/test_server_helpers.js",
+        "db:index:review": "node scripts/review_indexes.js",
+        "db:index:sync": "node scripts/sync_indexes.js",
+        "lint": "eslint .",
+        "format": "prettier --write .",
+        "seed:myrtle": "node scripts/seed_myrtle_trip.js",
+        "seed:outings": "node scripts/seed_blue_ridge_outings.js",
+        "seed:masters": "node scripts/seed_masters_pool.js",
+        "seed:plastered": "node scripts/seed_plastered_open.js",
+        "seed:plastered:full": "node scripts/seed_plastered_open.js && node scripts/seed_plastered_open_tournament.js"
+    },
+    "dependencies": {
+        "compression": "^1.8.1",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.19.2",
+        "express-rate-limit": "^7.4.0",
+        "mongoose": "^8.7.0",
+        "multer": "^1.4.5-lts.1",
+        "node-fetch": "^2.7.0",
+        "nodemailer": "^8.0.4",
+        "resend": "^2.1.0",
+        "xlsx": "^0.18.5"
+    },
+    "devDependencies": {
+        "esbuild": "^0.27.3",
+        "eslint": "^8.57.1",
+        "eslint-config-prettier": "^9.1.2",
+        "nodemon": "^3.1.4",
+        "prettier": "^3.1.0"
+    }
+}

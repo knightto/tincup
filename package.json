@@ -1,5 +1,5 @@
 {
-  "name": "tincup5",
+  "name": "tincup",
   "version": "1.0.0",
   "private": true,
   "type": "commonjs",
@@ -7,7 +7,8 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",

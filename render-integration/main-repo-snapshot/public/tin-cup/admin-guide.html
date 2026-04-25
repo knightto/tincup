@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tin Cup Admin Guide</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/tin-cup/manifest.json">
+  <meta name="theme-color" content="#173224">
+  <meta name="application-name" content="Tin Cup 2026">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tin Cup">
+  <link rel="apple-touch-icon" href="/assets/tin-cup.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/pwa-shell.css">
+  <script src="/pwa-shell.js" defer></script>
+  <style>
+    :root {
+      --bg: #112417;
+      --panel: #274235;
+      --panel-soft: #355743;
+      --ink: #f9f3e7;
+      --ink-soft: #d2dfc3;
+      --muted: #aebc9a;
+      --accent: #c89a4b;
+      --accent-2: #dce8c8;
+      --border: rgba(232,255,219,0.14);
+      --shadow: 0 20px 50px rgba(34,44,28,0.28);
+      --radius: 16px;
+      --icon-flag: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c89a4b' d='M6 3a1 1 0 0 1 1 1v2h9.6l-1.3 3 1.3 3H7v8H5V4a1 1 0 0 1 1-1Z'/%3E%3Ccircle cx='6' cy='20' r='2' fill='%23d2dfc3'/%3E%3C/svg%3E");
+      --icon-ball: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='%23f9f3e7' stroke='%23c89a4b' stroke-width='1.5'/%3E%3Ccircle cx='9' cy='9' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='13.5' cy='8' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='15.5' cy='12' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='10.5' cy='14' r='1' fill='%23c89a4b'/%3E%3Ccircle cx='13.5' cy='16' r='1' fill='%23c89a4b'/%3E%3C/svg%3E");
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(200,154,75,0.14), transparent 35%),
+        radial-gradient(circle at 82% 0%, rgba(220,232,200,0.10), transparent 30%),
+        var(--bg);
+    }
+    .guide-wrap {
+      max-width: 1120px;
+      margin: 18px auto 34px;
+      padding: 0 14px;
+    }
+    .hero,
+    .guide-card {
+      background: linear-gradient(145deg, var(--panel) 0%, #1f3427 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .hero {
+      display: grid;
+      gap: 10px;
+    }
+    h1,
+    h2,
+    .guide-pill::before,
+    .guide-link::before,
+    .guide-card h2::before {
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+    h1,
+    .guide-card h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+    h1 {
+      font-size: clamp(1.2rem, 2.8vw, 1.6rem);
+    }
+    h1::before,
+    .guide-card h2::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      background-image: var(--icon-flag);
+    }
+    .hero p,
+    .guide-card p,
+    .guide-card li,
+    .guide-card td {
+      line-height: 1.6;
+    }
+    .muted {
+      color: var(--ink-soft);
+    }
+    .guide-pill-row,
+    .guide-link-row,
+    .two-col {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .guide-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--ink-soft);
+      padding: 7px 12px;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+    .guide-pill::before,
+    .guide-link::before {
+      content: "";
+      width: 12px;
+      height: 12px;
+      flex: 0 0 12px;
+      background-image: var(--icon-ball);
+    }
+    .guide-link-row {
+      margin-top: 2px;
+    }
+    .guide-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--accent-2);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .guide-link:hover {
+      text-decoration: underline;
+    }
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 12px;
+    }
+    .guide-card h2 {
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+    }
+    .guide-card ul,
+    .guide-card ol {
+      margin: 10px 0 0 20px;
+      padding: 0;
+    }
+    .guide-card li + li {
+      margin-top: 6px;
+    }
+    .callout {
+      border: 1px solid rgba(200,154,75,0.35);
+      background: rgba(200,154,75,0.12);
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: var(--ink);
+    }
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.92rem;
+    }
+    .info-table th,
+    .info-table td {
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      padding: 8px 10px;
+    }
+    .info-table th {
+      color: var(--ink-soft);
+      width: 34%;
+      font-weight: 700;
+    }
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-2);
+      font-weight: 700;
+      text-decoration: none;
+      margin-top: 4px;
+    }
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+    @media (max-width: 720px) {
+      .info-table th,
+      .info-table td {
+        display: block;
+        width: 100%;
+      }
+      .info-table th {
+        padding-bottom: 2px;
+        border-bottom: 0;
+      }
+      .info-table td {
+        padding-top: 0;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/tin-cup/theme.css">
+</head>
+<body>
+  <main class="guide-wrap">
+    <section class="hero">
+      <div>
+        <h1>Tin Cup 2026 Admin Guide</h1>
+        <p class="muted">This page documents the current Tin Cup admin workflow: where data is entered, which items are manual, and which pages are verification-only.</p>
+      </div>
+      <div class="guide-pill-row">
+        <span class="guide-pill">Leader Inputs is the setup area for roster, config, and manual side games</span>
+        <span class="guide-pill">Lodging edits stay on the Lodging page</span>
+        <span class="guide-pill">Results and Readable Final Report are read-only verification</span>
+      </div>
+      <div class="guide-link-row">
+        <a id="guideTripLink" class="guide-link" href="/tin-cup/trip-2026.html">Trip Page</a>
+        <a id="guideScoreLink" class="guide-link" href="/tin-cup/scorekeeper.html">Score</a>
+        <a id="guideLeaderboardLink" class="guide-link" href="/tin-cup/leaderboard-2026.html">Results</a>
+        <a id="guideLodgingLink" class="guide-link" href="/tin-cup/guests-lodging.html">Lodging</a>
+      </div>
+    </section>
+
+    <section class="guide-card">
+      <h2>Page Map</h2>
+      <table class="info-table">
+        <tr>
+          <th>Tin Cup 2026</th>
+          <td>Main trip page. Use it to review the schedule, open Trip Info, jump to Score, Results, Lodging, and add trip tee times to your calendar.</td>
+        </tr>
+        <tr>
+          <th>Score</th>
+          <td>Main admin workspace. Start in <strong>Leader Inputs</strong> for roster, scoring config, and manual side-game setup, then use <strong>Score-Driven Entry</strong> for live hole scores, scramble scoring, markers, and scorecard access.</td>
+        </tr>
+        <tr>
+          <th>Results</th>
+          <td>Read-only verification page. Use it to confirm totals, gross and net stroke results, match points, scramble points, skins, side games, payouts, the readable report, and audit rows after entries are saved.</td>
+        </tr>
+        <tr>
+          <th>Lodging</th>
+          <td>Manual condo, room, extra-night, and payment management. The golfer list on this page comes from the Admin roster and should not be edited here.</td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="guide-card">
+      <h2>1. Set Up The Outing</h2>
+      <ol>
+        <li>Open <strong>Admin</strong> first. Complete the leader-input section before anyone starts scoring.</li>
+        <li>Use <strong>Golfer Roster Setup</strong> to enter the player list, handicaps, and classification tags such as previous champ or rookie.</li>
+        <li>Use <strong>Scoring Rules and Payout Config</strong> to confirm entry fee, place payouts, side-game values, skins value, and scramble point settings.</li>
+        <li>Use <strong>Manual Side Game Inputs</strong> to confirm Long Putt and any other leader-entered winners that are not derived directly from golf scores.</li>
+        <li>Use <strong>Admin Tools</strong> to confirm live scoring, live markers, leaderboard access, and reset/reseed controls before Round 1 starts.</li>
+        <li>Return to the trip page and confirm the top links open the correct Tin Cup scoring and results pages.</li>
+      </ol>
+    </section>
+
+    <section class="guide-card">
+      <h2>2. Test The Outing</h2>
+      <ol>
+        <li>Use <strong>Clear And Reseed Demo Scores</strong> on Admin if you want a full practice run with fresh sample results.</li>
+        <li>Open at least one live scorecard and confirm hole entry works, current-hole navigation works, and the full scorecard can be shown and hidden.</li>
+        <li>Open a scramble team and enter a few scramble holes to confirm scramble totals and points update.</li>
+        <li>Enter a marker on a valid Closest To Pin or Long Drive hole and confirm it appears on the results page.</li>
+        <li>Open <strong>Results</strong> and confirm the leaderboard, stroke results, scramble, side games, readable report, and payouts all render without missing data.</li>
+      </ol>
+    </section>
+
+    <section class="guide-card">
+      <h2>3. Confirm Scoring Accuracy</h2>
+      <ol>
+        <li>Use <strong>Stroke Results (Read-Only)</strong> on Results to compare gross and net numbers for Day 1, Day 3, and Day 4.</li>
+        <li>Use <strong>Tin Cup Match Scoring By Day</strong> and <strong>Hole-By-Hole Match Detail</strong> to verify match points came from the entered hole scores.</li>
+        <li>Use <strong>Scramble Results</strong> to verify team totals, rank, and distributed scramble points.</li>
+        <li>Use <strong>Skins</strong>, <strong>Manual Side Game Inputs</strong>, and <strong>Payout Summary</strong> to verify side-game winners and money distribution.</li>
+        <li>Use <strong>Workbook Results Audit</strong> as the final cross-check table to confirm trip finish, score ranking, scramble, skins, and payouts all agree.</li>
+      </ol>
+    </section>
+
+    <section class="guide-card">
+      <h2>4. Save The Report</h2>
+      <ol>
+        <li>Open <strong>Results</strong> and expand <strong>Readable Final Report</strong>.</li>
+        <li>Select <strong>Generate Readable Report</strong> to build the presentation-friendly winner summary.</li>
+        <li>Select <strong>Print / Save As PDF</strong> to save a readable final report for the group leader.</li>
+        <li>Use <strong>Open Final Competition Report</strong> or <strong>Open Printable Report</strong> from Admin when you need a polished presentation document for the group leader.</li>
+        <li>Use <strong>Export Final Competition CSV</strong> from Admin when you also want a raw archive of standings, scorecards, scramble, markers, side games, and payouts.</li>
+      </ol>
+    </section>
+
+    <div class="guide-grid">
+      <section class="guide-card">
+        <h2>Main Trip Page</h2>
+        <ul>
+          <li>Use <strong>Trip Info</strong> to open the travel and trip details modal.</li>
+          <li>Use the calendar to switch days inside the current Tin Cup trip month. The calendar is locked to the trip month and does not move outside it.</li>
+          <li>Use <strong>Add trip tee times to your calendar</strong> to download the trip tee times into a calendar app.</li>
+          <li>Use the top chips to open <strong>Results</strong>, <strong>Lodging</strong>, <strong>Score</strong>, and this guide.</li>
+          <li>Event cards, tee times, travel links, map links, and course details are primarily review surfaces on this page, not the main place for scoring changes.</li>
+        </ul>
+      </section>
+
+      <section class="guide-card">
+        <h2>Live Scorecard Access</h2>
+        <ul>
+          <li>Choose a round from the <strong>Day</strong> selector. This includes <strong>Scramble</strong> in the same selector as the other rounds.</li>
+          <li>Open a group link to launch the live scorecard for a foursome or scramble team.</li>
+          <li>Scorers enter their name when opening a card. The page is organized to keep the current hole and relevant marker visible without showing the entire scorecard by default.</li>
+          <li>Use the hole jump strip to move between holes. The mobile score pad supports <strong>-</strong>, <strong>+</strong>, <strong>Clear</strong>, and quick score chips.</li>
+          <li>Use <strong>Full Scorecard</strong> only for review. Hole-by-hole entry is the main scoring surface.</li>
+          <li>On non-scramble rounds, the scorecard auto-locks as soon as all 18 holes are entered for every player. Editing a submitted card still requires an admin-code override.</li>
+        </ul>
+      </section>
+
+      <section class="guide-card">
+        <h2>Markers And Side Games</h2>
+        <ul>
+          <li><strong>Live Markers</strong> is where Closest To Pin and Long Drive winners are assigned on applicable holes.</li>
+          <li><strong>Manual Side Game Inputs</strong> is where Long Putt and other leader-entered side-game winners are saved.</li>
+          <li><strong>Secret Snowman</strong> is score-driven and is drawn from an eligible score of 8 after the relevant day has real or seeded scores.</li>
+          <li>The leaderboard and payout tables update from the saved Long Putt selection and the Secret Snowman draw result.</li>
+          <li>If marker entry is hidden, re-enable it from the <strong>Admin Tools</strong> live-scoring toggles.</li>
+        </ul>
+      </section>
+
+      <section class="guide-card">
+        <h2>Golfer Roster Setup</h2>
+        <ul>
+          <li>Use <strong>Add Golfer Row</strong> to insert a blank player row.</li>
+          <li>Use <strong>Import Golfers CSV</strong> to load roster rows from a CSV file.</li>
+          <li>Use <strong>Save Golfer Setup</strong> after roster edits.</li>
+          <li>Each row includes <strong>Name</strong>, <strong>Handicap</strong>, <strong>Classification</strong>, and <strong>Penalty</strong>.</li>
+          <li>Classification is where previous champions and rookies are identified. Penalty is where manual scoring penalties are assigned to a golfer.</li>
+          <li>This roster is the source for the Lodging page. Do not try to add golfers from Lodging.</li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="guide-card">
+      <h2>Scoring Rules And Payout Config</h2>
+      <p class="muted">These values drive handicap conversion, points, side-game payouts, scramble points, and the final payout model.</p>
+      <table class="info-table">
+        <tr>
+          <th>Handicap fields</th>
+          <td><strong>Index-&gt;HC %</strong>, <strong>Avg Course Slope</strong>, <strong>Avg Slope</strong>, <strong>Max HC</strong>, and <strong>Par 3 Fraction</strong>.</td>
+        </tr>
+        <tr>
+          <th>Trip pot fields</th>
+          <td><strong>Entry Fee</strong>, <strong>Winner</strong>, <strong>2nd</strong>, <strong>3rd</strong>, and <strong>4th</strong>.</td>
+        </tr>
+        <tr>
+          <th>Side-game payouts</th>
+          <td><strong>Long Drive</strong>, <strong>CTP</strong>, <strong>Long Putt</strong>, <strong>Secret Snowman</strong>, <strong>Loser</strong>, and <strong>Skins / Person</strong>.</td>
+        </tr>
+        <tr>
+          <th>Scramble points</th>
+          <td><strong>Scramble 1st</strong>, <strong>Scramble 2nd</strong>, and <strong>Scramble 3rd</strong>.</td>
+        </tr>
+        <tr>
+          <th>Save action</th>
+          <td>Use <strong>Save Scoring Config</strong> after changes. The surrounding Pot Summary and handicap verification table are there to confirm the numbers before and after saving.</td>
+        </tr>
+      </table>
+    </section>
+
+    <div class="guide-grid">
+      <section class="guide-card">
+        <h2>Admin Tools</h2>
+        <ul>
+          <li><strong>Live Foursome Scoring</strong>: turns access to the Score live entry flow on or off.</li>
+          <li><strong>Closest To Pin / Long Drive Entry</strong>: shows or hides marker entry on the scoring page.</li>
+          <li><strong>Live Leaderboard Page</strong>: shows or hides the dedicated live results page and nav chip.</li>
+          <li><strong>Admin Code</strong> is used for protected admin actions, including reseeding, reset, and submitted-card override edits.</li>
+          <li><strong>Clear And Reseed Demo Scores</strong> removes existing competition scoring and generates a fresh random demo event for testing every scoring surface.</li>
+          <li><strong>Clear Competition</strong> removes scorecards, scramble scores, markers, side-game winners, and penalties so Tin Cup is ready for Round 1 while keeping player names, handicaps, live settings, and scoring config.</li>
+          <li><strong>Open Final Competition Report</strong> opens the polished summary document built from the final standings, score proof, side games, and payouts.</li>
+          <li><strong>Open Printable Report</strong> opens that same document in print-friendly mode so it can be saved as PDF for the group.</li>
+          <li><strong>Export Final Competition CSV</strong> downloads a full raw archive of final standings, scorecards, scramble results, markers, skins, side games, and payouts.</li>
+        </ul>
+      </section>
+
+      <section class="guide-card">
+        <h2>Lodging Page</h2>
+        <ul>
+          <li>Use the status summary and condo groups to see who is assigned, unassigned, or outside the active condo count.</li>
+          <li>Manual lodging inputs include <strong>Assign to condo</strong>, <strong>Move condo</strong>, <strong>Room</strong>, <strong>Unassign</strong>, <strong>Extra night</strong>, and <strong>Paid</strong>.</li>
+          <li>The Lodging page is also where Tin Cup payment amounts are maintained.</li>
+          <li>The roster list itself is not edited here. If a golfer is missing or needs to be removed, do that in <strong>Admin</strong>.</li>
+        </ul>
+      </section>
+
+      <section class="guide-card">
+        <h2>Results Page</h2>
+        <ul>
+          <li>Use <strong>Day</strong> to switch the live day leaderboard.</li>
+          <li>Use the match day tabs to review hole-by-hole match results by day.</li>
+          <li>Review read-only sections for readable final report, stroke results, score rankings, skins, scramble, side games, payouts, and workbook results audit.</li>
+          <li><strong>Stroke Results (Read-Only)</strong> now shows both gross and net round totals for scoring confirmation.</li>
+          <li>If numbers look wrong here, the fix normally belongs on the Admin, Score, or Lodging page, not on the results page itself.</li>
+        </ul>
+      </section>
+
+      <section class="guide-card">
+        <h2>Automatic Vs Manual</h2>
+        <div class="callout">Automatic calculations: gross and net day totals, trip totals, handicap stroke application, penalties, Secret Snowman draw eligibility, skins, scramble points, payout rollups, readable report output, and audit tables after data is saved.</div>
+        <ul>
+          <li>Manual entry surfaces: roster rows, handicaps, classifications, penalties, hole scores, markers, Long Putt, live-access toggles, condo assignments, extra nights, and payment amounts.</li>
+          <li>Verification surfaces: Results, Readable Final Report, Pot Summary, handicap verification, full scorecard review, and trip-page schedule/event displays.</li>
+        </ul>
+      </section>
+    </div>
+
+    <section class="guide-card">
+      <h2>Recommended Admin Workflow</h2>
+      <ol>
+        <li>Before the trip, finish every field in <strong>Leader Inputs</strong>: roster, handicap values, classifications, penalties, payout config, scramble points, and any manual side-game setup.</li>
+        <li>Before each round, confirm the correct day is selected, live scoring is enabled, and the scorecard links open the expected foursomes or scramble teams.</li>
+        <li>During play, enter hole scores first. Let the scorecards drive every value that can be derived from actual golf scores.</li>
+        <li>After score entry, save markers and any manual side-game winners that are not score-driven.</li>
+        <li>After each round, review <strong>Results</strong> using gross/net stroke results, match detail, scramble, skins, payouts, and workbook audit to confirm the math.</li>
+        <li>At the end of the event, generate the <strong>Readable Final Report</strong>, save it as PDF, and export the final CSV archive.</li>
+      </ol>
+    </section>
+
+    <a id="guideBackLink" class="footer-link" href="/tin-cup/trip-2026.html">Back to Tin Cup 2026</a>
+  </main>
+
+  <script>
+    const TIN_CUP_CONTEXT_STORAGE_KEY = 'tinCupTripContextV1';
+    const qs = new URLSearchParams(window.location.search);
+    let tripId = String(qs.get('tripId') || '').trim() || null;
+    let useSecondaryTripDb = qs.get('secondary') === '1' || qs.get('myrtleBeach2026') === 'true';
+
+    (function seedTripContext() {
+      const qsSecondary = String(qs.get('secondary') || '').trim();
+      if (qsSecondary === '0' || qsSecondary.toLowerCase() === 'false') useSecondaryTripDb = false;
+      if (qsSecondary === '1' || qsSecondary.toLowerCase() === 'true') useSecondaryTripDb = true;
+      if (tripId) return;
+      try {
+        const raw = localStorage.getItem(TIN_CUP_CONTEXT_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.tripId) tripId = String(parsed.tripId);
+        if (parsed && parsed.secondary === '0') useSecondaryTripDb = false;
+        if (parsed && parsed.secondary === '1') useSecondaryTripDb = true;
+      } catch (_err) {}
+    })();
+
+    function withContextHref(path) {
+      if (!tripId) {
+        if (/\/tin-cup\/live-score-entry\.html$/i.test(path)) {
+          const sep = path.includes('?') ? '&' : '?';
+          return `${path}${sep}local=1`;
+        }
+        return path;
+      }
+      const sep = path.includes('?') ? '&' : '?';
+      return `${path}${sep}tripId=${encodeURIComponent(String(tripId))}&secondary=${useSecondaryTripDb ? '1' : '0'}`;
+    }
+
+    [
+      ['guideTripLink', '/tin-cup/trip-2026.html'],
+      ['guideScoreLink', '/tin-cup/scorekeeper.html'],
+      ['guideLeaderboardLink', '/tin-cup/leaderboard-2026.html'],
+      ['guideLodgingLink', '/tin-cup/guests-lodging.html'],
+      ['guideBackLink', '/tin-cup/trip-2026.html']
+    ].forEach(([id, path]) => {
+      const el = document.getElementById(id);
+      if (el) el.href = withContextHref(path);
+    });
+  </script>
+</body>
+</html>

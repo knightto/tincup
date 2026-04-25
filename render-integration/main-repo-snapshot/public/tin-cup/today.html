@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tin Cup Today</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/tin-cup/manifest.json">
+  <meta name="theme-color" content="#173224">
+  <meta name="application-name" content="Tin Cup 2026">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tin Cup">
+  <link rel="apple-touch-icon" href="/assets/tin-cup.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/pwa-shell.css">
+  <script src="/pwa-shell.js" defer></script>
+  <style>
+    :root {
+      --bg:#112417;
+      --panel:#274235;
+      --line:rgba(232,255,219,.14);
+      --ink:#f9f3e7;
+      --muted:#d2dfc3;
+      --accent:#c89a4b;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family:'Segoe UI', Arial, sans-serif;
+      background:radial-gradient(circle at 20% 10%, rgba(200,154,75,.14), transparent 32%), var(--bg);
+      color:var(--ink);
+      padding-bottom:84px;
+    }
+    .wrap {
+      max-width:980px;
+      margin:18px auto 40px;
+      padding:0 14px;
+      display:grid;
+      gap:12px;
+    }
+    .card {
+      background:linear-gradient(140deg, var(--panel), #1f3427);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+    }
+    .head {
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .golf-title {
+      margin:0;
+      font-size:1.35rem;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .golf-title::before {
+      content:"";
+      width:15px;
+      height:15px;
+      display:inline-block;
+      background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c89a4b' d='M6 3a1 1 0 0 1 1 1v2h9.6l-1.3 3 1.3 3H7v8H5V4a1 1 0 0 1 1-1Z'/%3E%3Ccircle cx='6' cy='20' r='2' fill='%23d2dfc3'/%3E%3C/svg%3E") center/contain no-repeat;
+    }
+    .row,
+    .status-row,
+    .app-bottom-nav {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .row { align-items:center; }
+    .status-chip,
+    .quick-link,
+    .bottom-nav-link {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      min-height:38px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      text-decoration:none;
+      color:var(--ink);
+      background:#173224;
+      font-weight:700;
+    }
+    .status-chip { font-size:.78rem; min-height:auto; padding:6px 10px; background:rgba(255,255,255,.05); }
+    .status-chip.warn { border-color:rgba(200,154,75,.4); color:#f4e5bf; }
+    .status-chip.live { border-color:rgba(94,214,122,.45); background:rgba(94,214,122,.14); color:#dff6d9; }
+    .status-chip.ready { border-color:rgba(94,173,255,.45); background:rgba(94,173,255,.14); color:#dbeeff; }
+    .quick-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+      gap:10px;
+    }
+    .quick-action {
+      display:grid;
+      gap:4px;
+      text-decoration:none;
+      color:var(--ink);
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+    }
+    .quick-action strong { font-size:.96rem; }
+    .muted { color:var(--muted); font-size:.84rem; line-height:1.45; }
+    .today-grid {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+    .today-panel {
+      display:grid;
+      gap:10px;
+    }
+    .summary-list {
+      display:grid;
+      gap:8px;
+    }
+    .summary-item {
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+    }
+    .tee-sheet {
+      display:grid;
+      gap:8px;
+    }
+    .leaderboard-list,
+    .score-links-list {
+      display:grid;
+      gap:8px;
+    }
+    .leader-row,
+    .score-link-row {
+      display:grid;
+      gap:6px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+    }
+    .leader-row strong,
+    .score-link-row strong {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .score-link-actions {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .mini-link {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:34px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      text-decoration:none;
+      color:var(--ink);
+      background:#173224;
+      font-weight:700;
+      font-size:.8rem;
+    }
+    .tee-row {
+      display:grid;
+      gap:6px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.03);
+    }
+    .tee-row strong {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .player-list {
+      display:grid;
+      gap:4px;
+      color:var(--muted);
+      font-size:.84rem;
+    }
+    .empty-state {
+      padding:12px;
+      border-radius:12px;
+      background:rgba(255,255,255,.04);
+      border:1px dashed rgba(255,255,255,.12);
+      color:var(--muted);
+    }
+    .app-bottom-nav {
+      position:fixed;
+      left:12px;
+      right:12px;
+      bottom:12px;
+      justify-content:space-between;
+      padding:8px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:rgba(17,36,23,.94);
+      backdrop-filter:blur(10px);
+      z-index:15;
+    }
+    .bottom-nav-link {
+      flex:1 1 0;
+      min-width:0;
+      font-size:.8rem;
+      padding:10px 8px;
+    }
+    .bottom-nav-link.active {
+      background:rgba(200,154,75,.22);
+      border-color:rgba(200,154,75,.7);
+      color:#f4e5bf;
+    }
+    @media (max-width: 760px) {
+      .today-grid { grid-template-columns:1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="/tin-cup/theme.css">
+</head>
+<body>
+  <div class="wrap">
+    <div class="card head">
+      <div>
+        <h1 class="golf-title">Tin Cup Today</h1>
+      </div>
+    </div>
+
+    <section class="card today-panel" style="margin-bottom:12px;">
+      <strong>Scoring Shortcuts</strong>
+      <div class="quick-grid">
+        <a id="scoreLink" class="quick-action" href="/tin-cup/scorekeeper.html">
+          <strong>Score</strong>
+          <div class="muted">Open the live scorekeeper view and jump into the current foursome.</div>
+        </a>
+        <a id="resultsLink" class="quick-action" href="/tin-cup/leaderboard-2026.html">
+          <strong>Results</strong>
+          <div class="muted">See the live leaderboard, day leaders, and score-driven results.</div>
+        </a>
+        <a id="fullTripLink" class="quick-action" href="/tin-cup/trip-2026.html">
+          <strong>Trip</strong>
+          <div class="muted">Go back to the trip hub for schedule, info, and secondary links.</div>
+        </a>
+      </div>
+    </section>
+
+    <div class="today-grid">
+      <section class="card today-panel">
+        <strong>Live Score Links</strong>
+        <div id="scoreLinksBoard" class="score-links-list"></div>
+      </section>
+
+      <section class="card today-panel">
+        <strong>Current Leaders</strong>
+        <div id="leadersBoard" class="leaderboard-list"></div>
+      </section>
+
+      <section class="card today-panel">
+        <strong>Today At A Glance</strong>
+        <div id="todaySummary" class="summary-list"></div>
+      </section>
+
+      <section class="card today-panel">
+        <strong>First Tee Sheet</strong>
+        <div id="teeSheet" class="tee-sheet"></div>
+      </section>
+    </div>
+  </div>
+
+  <nav class="app-bottom-nav" aria-label="Tin Cup Navigation">
+    <a id="bottomNavTrip" class="bottom-nav-link" href="/tin-cup/trip-2026.html">Trip</a>
+    <a id="bottomNavToday" class="bottom-nav-link active" href="/tin-cup/today.html">Today</a>
+    <a id="bottomNavScore" class="bottom-nav-link" href="/tin-cup/scorekeeper.html">Score</a>
+    <a id="bottomNavResults" class="bottom-nav-link" href="/tin-cup/leaderboard-2026.html">Results</a>
+  </nav>
+
+  <script>
+    const TIN_CUP_CONTEXT_STORAGE_KEY = 'tinCupTripContextV1';
+    let tripId = '';
+    let useSecondaryTripDb = false;
+
+    const $ = (selector) => document.querySelector(selector);
+    const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (ch) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[ch]));
+    const todaySummary = $('#todaySummary');
+    const teeSheet = $('#teeSheet');
+    const leadersBoard = $('#leadersBoard');
+    const scoreLinksBoard = $('#scoreLinksBoard');
+    const DAY_KEYS = ['Practice', 'Day 1', 'Day 2A', 'Day 2B', 'Day 3', 'Day 4'];
+
+    const tripApi = (path) => useSecondaryTripDb ? (path.includes('?') ? `${path}&myrtleBeach2026=true` : `${path}?myrtleBeach2026=true`) : path;
+
+    (function seedContext() {
+      const qs = new URLSearchParams(window.location.search);
+      const forcedId = String(qs.get('tripId') || '').trim();
+      const qSecondary = String(qs.get('secondary') || '').trim();
+      if (qSecondary === '1' || qSecondary.toLowerCase() === 'true') useSecondaryTripDb = true;
+      if (qSecondary === '0' || qSecondary.toLowerCase() === 'false') useSecondaryTripDb = false;
+      if (forcedId) {
+        tripId = forcedId;
+      } else {
+        try {
+          const raw = localStorage.getItem(TIN_CUP_CONTEXT_STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.tripId) tripId = String(parsed.tripId);
+            if (parsed && (parsed.secondary === '1' || parsed.secondary === 1 || parsed.secondary === true)) useSecondaryTripDb = true;
+            if (parsed && (parsed.secondary === '0' || parsed.secondary === 0 || parsed.secondary === false)) useSecondaryTripDb = false;
+          }
+        } catch (_err) {}
+      }
+    })();
+
+    function buildTinCupContextHref(path) {
+      if (!tripId) return path;
+      const sep = path.includes('?') ? '&' : '?';
+      return `${path}${sep}tripId=${encodeURIComponent(String(tripId))}&secondary=${useSecondaryTripDb ? '1' : '0'}`;
+    }
+
+    function syncLinks() {
+      const pairs = [
+        ['fullTripLink', '/tin-cup/trip-2026.html'],
+        ['adminGuideLink', '/tin-cup/admin-guide.html'],
+        ['scoreLink', '/tin-cup/scorekeeper.html'],
+        ['resultsLink', '/tin-cup/leaderboard-2026.html'],
+        ['lodgingLink', '/tin-cup/guests-lodging.html'],
+        ['adminLink', '/tin-cup/live-score-entry.html'],
+        ['bottomNavTrip', '/tin-cup/trip-2026.html'],
+        ['bottomNavToday', '/tin-cup/today.html'],
+        ['bottomNavScore', '/tin-cup/scorekeeper.html'],
+        ['bottomNavResults', '/tin-cup/leaderboard-2026.html'],
+        ['bottomNavLodging', '/tin-cup/guests-lodging.html'],
+        ['bottomNavAdmin', '/tin-cup/live-score-entry.html']
+      ];
+      pairs.forEach(([id, path]) => {
+        const el = document.getElementById(id);
+        if (el) el.href = buildTinCupContextHref(path);
+      });
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    }
+
+    function formatTime(value) {
+      if (!value) return '';
+      if (/am|pm/i.test(String(value))) return String(value);
+      const [hourText = '', minuteText = '00'] = String(value).split(':');
+      const hour = Number(hourText);
+      const minute = Number(minuteText);
+      if (!Number.isFinite(hour) || !Number.isFinite(minute)) return String(value);
+      const date = new Date();
+      date.setHours(hour, minute, 0, 0);
+      return date.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    }
+
+    function getPlayers(slot = {}) {
+      const rawPlayers = Array.isArray(slot.players) ? slot.players : [];
+      return rawPlayers.map((player) => {
+        if (player && typeof player === 'object') return String(player.name || player.playerName || '').trim();
+        return String(player || '').trim();
+      }).filter(Boolean);
+    }
+
+    function pickTodayRound(rounds = []) {
+      const usable = rounds.filter((round) => Array.isArray(round && round.teeTimes) && round.teeTimes.length);
+      if (!usable.length) return null;
+      const todayIso = new Date().toISOString().slice(0, 10);
+      return usable.find((round) => String(round.date || '').slice(0, 10) === todayIso) || usable[0];
+    }
+
+    function inferTinCupDayKey(round, rounds = []) {
+      if (!round) return '';
+      const roundName = String(round.name || round.title || round.course || '').toLowerCase();
+      if (roundName.includes('practice')) return 'Practice';
+      const usable = rounds.filter((entry) => Array.isArray(entry && entry.teeTimes) && entry.teeTimes.length);
+      const index = Math.max(0, usable.findIndex((entry) => entry === round));
+      if (index < DAY_KEYS.length) return DAY_KEYS[index];
+      return 'Day 1';
+    }
+
+    function buildScorecardLink(dayKey, slotIndex) {
+      const url = new URL(buildTinCupContextHref('/tin-cup/scorekeeper.html'), window.location.origin);
+      url.searchParams.set('dayKey', dayKey);
+      url.searchParams.set('slotIndex', String(slotIndex));
+      return `${url.pathname}${url.search}`;
+    }
+
+    function renderLeaders(rows = []) {
+      if (!leadersBoard) return;
+      if (!Array.isArray(rows) || !rows.length) {
+        leadersBoard.innerHTML = '<div class="empty-state">Leaders will appear after scoring data is available.</div>';
+        return;
+      }
+      leadersBoard.innerHTML = rows.slice(0, 5).map((row, index) => `
+        <div class="leader-row">
+          <strong><span>${index + 1}. ${esc(row.playerName || row.name || 'Player')}</span><span>${esc(Number(row.tripTotal || row.total || 0).toFixed(2))}</span></strong>
+          <div class="muted">Day ${esc(Number(row.dayTotal || row.dayPoints || 0).toFixed(2))} | Match ${esc(Number(row.matchTotal || row.matchPoints || 0).toFixed(2))} | Scramble ${esc(Number(row.scramble || 0).toFixed(2))}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderScoreLinks(dayKey, meta = {}) {
+      if (!scoreLinksBoard) return;
+      const daySlots = Array.isArray(meta && meta.daySlots) ? meta.daySlots : [];
+      const dayRow = daySlots.find((row) => String(row && row.dayKey || '') === String(dayKey || ''));
+      const slots = Array.isArray(dayRow && dayRow.slots) ? dayRow.slots : [];
+      if (!dayKey || !slots.length) {
+        scoreLinksBoard.innerHTML = '<div class="empty-state">Live links will appear once the day and foursomes are available.</div>';
+        return;
+      }
+      scoreLinksBoard.innerHTML = slots.map((slot, index) => {
+        const players = (Array.isArray(slot && slot.players) ? slot.players : []).map((player) => {
+          if (player && typeof player === 'object') return String(player.name || '').trim();
+          return String(player || '').trim();
+        }).filter(Boolean);
+        const href = buildScorecardLink(dayKey, Number(slot && slot.slotIndex != null ? slot.slotIndex : index));
+        return `
+          <div class="score-link-row">
+            <strong><span>${esc(slot && slot.label ? slot.label : `Group ${index + 1}`)}</span><span>${esc(dayKey)}</span></strong>
+            <div class="muted">${players.length ? esc(players.join(' | ')) : 'Players not assigned yet.'}</div>
+            <div class="score-link-actions">
+              <a class="mini-link" href="${esc(href)}">Open Score</a>
+              <a class="mini-link" href="${esc(`${href}&view=card`)}" target="_blank" rel="noopener">New Tab</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSummary(round, settings = {}) {
+      if (!round) {
+        todaySummary.innerHTML = '<div class="empty-state">No round details are available yet.</div>';
+        teeSheet.innerHTML = '<div class="empty-state">No tee sheet is available yet.</div>';
+        return;
+      }
+      const firstTee = (round.teeTimes || []).find((slot) => String(slot && slot.time || '').trim()) || {};
+      const slotCount = Array.isArray(round.teeTimes) ? round.teeTimes.length : 0;
+      todaySummary.innerHTML = `
+        <div class="summary-item"><strong>${esc(round.course || 'Upcoming round')}</strong><div class="muted">${esc(formatDate(round.date) || 'Date TBD')}</div></div>
+        <div class="summary-item"><strong>First Tee</strong><div class="muted">${esc(formatTime(firstTee.time) || 'TBD')}</div></div>
+        <div class="summary-item"><strong>Groups</strong><div class="muted">${esc(slotCount)} tee times loaded for the current round.</div></div>
+      `;
+      teeSheet.innerHTML = (round.teeTimes || []).slice(0, 4).map((slot, index) => {
+        const players = getPlayers(slot);
+        const playerMarkup = players.length
+          ? players.map((name) => `<div>${esc(name)}</div>`).join('')
+          : '<div>No golfers assigned yet.</div>';
+        return `
+          <div class="tee-row">
+            <strong>
+              <span>${esc(slot.label || `Group ${index + 1}`)}</span>
+              <span>${esc(formatTime(slot.time) || 'TBD')}</span>
+            </strong>
+            <div class="player-list">${playerMarkup}</div>
+          </div>
+        `;
+      }).join('') || '<div class="empty-state">No tee sheet is available yet.</div>';
+    }
+
+    async function loadPage() {
+      syncLinks();
+      if (!tripId) {
+        renderSummary(null, {});
+        return;
+      }
+      try {
+        const [tripRes, metaRes, leaderboardRes] = await Promise.all([
+          fetch(tripApi(`/api/trips/${tripId}`)),
+          fetch(tripApi(`/api/trips/${tripId}/tin-cup/live/meta`)),
+          fetch(tripApi(`/api/trips/${tripId}/tin-cup/live/leaderboard?day=Day+1&matchDay=Day+1`))
+        ]);
+        const tripPayload = tripRes.ok ? await tripRes.json() : {};
+        const metaPayload = metaRes.ok ? await metaRes.json() : {};
+        const leaderboardPayload = leaderboardRes.ok ? await leaderboardRes.json() : {};
+        const trip = tripPayload && tripPayload.trip ? tripPayload.trip : null;
+        const rounds = Array.isArray(trip && trip.rounds) ? trip.rounds : [];
+        const round = pickTodayRound(rounds);
+        const dayKey = inferTinCupDayKey(round, rounds);
+        renderSummary(round, metaPayload && metaPayload.settings ? metaPayload.settings : {});
+        renderScoreLinks(dayKey, metaPayload || {});
+        renderLeaders((leaderboardPayload && leaderboardPayload.totals) || []);
+      } catch (error) {
+        todaySummary.innerHTML = `<div class="empty-state">${esc(error && error.message ? error.message : 'Unable to load Tin Cup today view.')}</div>`;
+        teeSheet.innerHTML = '<div class="empty-state">Try reloading the page from the trip screen.</div>';
+        if (scoreLinksBoard) scoreLinksBoard.innerHTML = '<div class="empty-state">Live links are unavailable right now.</div>';
+        if (leadersBoard) leadersBoard.innerHTML = '<div class="empty-state">Leaders are unavailable right now.</div>';
+      }
+    }
+
+    loadPage();
+  </script>
+</body>
+</html>

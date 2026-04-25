@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/tin-cup/manifest.json">
+  <meta name="theme-color" content="#173224">
+  <meta name="application-name" content="Tin Cup 2026">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tin Cup">
+  <link rel="apple-touch-icon" href="/assets/tin-cup.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/pwa-shell.css">
+  <title>Tin Cup Lodging</title>
+  <script src="/pwa-shell.js" defer></script>
+  <style>
+    :root {
+      --bg: #f4ecd7;
+      --panel: #274235;
+      --panel-soft: #355743;
+      --ink: #f9f3e7;
+      --ink-soft: #d2dfc3;
+      --muted: #aebc9a;
+      --accent: #c89a4b;
+      --border: rgba(232,255,219,0.14);
+      --shadow: 0 20px 50px rgba(34,44,28,0.28);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(200,154,75,0.14), transparent 32%),
+        radial-gradient(circle at 85% 0%, rgba(220,232,200,0.10), transparent 28%),
+        #112417;
+      padding-bottom: 84px;
+    }
+    .container { max-width: 1150px; margin: 18px auto 34px; padding: 0 14px; }
+    .panel {
+      background: linear-gradient(145deg, var(--panel) 0%, #1f3427 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 12px;
+      align-items: start;
+    }
+    .cards-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .condo-group {
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+    .participant-card {
+      border: 1px solid var(--border);
+      background: rgba(249,243,231,0.04);
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      gap: 6px;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    }
+    .participant-card[draggable="true"] {
+      cursor: grab;
+    }
+    .participant-card.is-dragging {
+      opacity: 0.55;
+      transform: scale(0.98);
+    }
+    .participant-card.is-drop-target {
+      border-color: rgba(200,154,75,0.75);
+      box-shadow: 0 0 0 2px rgba(200,154,75,0.22);
+    }
+    .participant-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .participant-summary strong {
+      color: #fff;
+    }
+    .participant-meta {
+      color: var(--ink-soft);
+      font-size: 0.8rem;
+    }
+    .participant-card details > summary {
+      cursor: pointer;
+      color: var(--accent);
+      font-weight: 700;
+      list-style: none;
+    }
+    .participant-card details > summary::-webkit-details-marker {
+      display: none;
+    }
+    .fields-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 92px 104px;
+      gap: 6px;
+      align-items: end;
+    }
+    .stacked { display: grid; gap: 4px; }
+    .stacked span { color: var(--ink-soft); font-size: 0.78rem; }
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    #unassignedSidebar {
+      background: var(--panel-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+    }
+    #unassignedSidebar ul {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+    #unassignedSidebar li {
+      border: 1px solid var(--border);
+      background: rgba(249,243,231,0.04);
+      border-radius: 10px;
+      padding: 8px;
+    }
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .status-pill {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      background: rgba(249,243,231,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--ink-soft);
+    }
+    input, select, button {
+      font: inherit;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: #0b1728;
+      color: var(--ink);
+      padding: 8px 10px;
+    }
+    button { cursor: pointer; font-weight: 700; }
+    a.cta { color: var(--accent); text-decoration: none; font-weight: 700; }
+    a.cta:hover { text-decoration: underline; }
+    .status-row,
+    .app-bottom-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .status-chip,
+    .bottom-nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .status-chip {
+      padding: 7px 10px;
+      font-size: 0.78rem;
+    }
+    .status-chip.warn {
+      color: #f4e5bf;
+      border-color: rgba(200,154,75,0.45);
+    }
+    .app-bottom-nav {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 1200;
+      justify-content: space-between;
+      padding: 8px;
+      background: rgba(16, 36, 29, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+    }
+    .bottom-nav-link {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 8px 6px;
+      background: transparent;
+      border-color: transparent;
+      font-size: 0.74rem;
+      text-align: center;
+    }
+    .bottom-nav-link.active {
+      background: rgba(200,154,75,0.18);
+      border-color: rgba(200,154,75,0.5);
+      color: #f4e5bf;
+    }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .fields-row { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: 1fr; }
+      .app-bottom-nav {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        gap: 4px;
+      }
+      .bottom-nav-link {
+        font-size: 0.7rem;
+        padding: 8px 4px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/tin-cup/theme.css">
+</head>
+<body>
+  <main class="container">
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;">
+        <h1 class="golf-title" style="margin:0;font-size:1.35rem;">Tin Cup Lodging</h1>
+      </div>
+      <div id="tripMeta" style="margin-top:6px;color:var(--ink-soft);">Loading trip...</div>
+    </section>
+
+    <section class="panel">
+      <div class="status-row">
+        <span id="lodgingDataChip" class="status-chip">Data</span>
+        <span id="lodgingRosterChip" class="status-chip">Roster</span>
+        <span id="lodgingMapChip" class="status-chip">Assignments</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <h2 class="golf-section-title" style="margin:0;font-size:1.05rem;">Lodging</h2>
+        <div style="color:var(--muted);font-size:0.88rem;">Golfer roster is managed from the Tin Cup data page.</div>
+      </div>
+      <div id="statusSummaryRow" style="margin-top:10px;"></div>
+      <div class="layout" style="margin-top:10px;">
+        <div id="condoGroups" class="cards-grid"></div>
+        <div id="unassignedSidebar"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="golf-section-title" style="margin:0 0 10px 0;font-size:1.05rem;">Tin Cup Payment</h2>
+      <div id="allParticipantsList"></div>
+    </section>
+  </main>
+  <nav class="app-bottom-nav" aria-label="Tin Cup Navigation">
+    <a id="bottomNavTrip" class="bottom-nav-link" href="/tin-cup/trip-2026.html">Trip</a>
+    <a id="bottomNavToday" class="bottom-nav-link" href="/tin-cup/today.html">Today</a>
+    <a id="bottomNavScore" class="bottom-nav-link" href="/tin-cup/scorekeeper.html">Score</a>
+    <a id="bottomNavResults" class="bottom-nav-link" href="/tin-cup/leaderboard-2026.html">Results</a>
+    <a id="bottomNavLodging" class="bottom-nav-link active" href="/tin-cup/guests-lodging.html">Lodging</a>
+    <a id="bottomNavAdmin" class="bottom-nav-link" href="/tin-cup/live-score-entry.html">Admin</a>
+  </nav>
+
+  <script>
+    const STATUS_ORDER = ['in', 'out', 'maybe', 'waitlist', 'invited'];
+    const STATUS_LABELS = { invited: 'Invited', in: 'In', maybe: 'Maybe', out: 'Out', waitlist: 'Waitlist' };
+    const BASE_GROUP_SIZES = [4, 8, 12, 16, 20, 24];
+    const DEFAULT_GROUP_SIZE = 16;
+    const TIN_CUP_CONTEXT_STORAGE_KEY = 'tinCupTripContextV1';
+
+    const qs = new URLSearchParams(window.location.search);
+    let useSecondaryTripDb = qs.get('secondary') === '1' || qs.get('myrtleBeach2026') === 'true';
+    let tripId = (qs.get('tripId') || '').trim() || null;
+    let trip = null;
+    let participants = [];
+    let adminCode = null;
+    let lodgingDragParticipantId = null;
+
+    (function seedTripContext() {
+      const qsSecondary = String(qs.get('secondary') || '').trim();
+      if (qsSecondary === '0' || qsSecondary.toLowerCase() === 'false') useSecondaryTripDb = false;
+      if (qsSecondary === '1' || qsSecondary.toLowerCase() === 'true') useSecondaryTripDb = true;
+      const forcedId = String(qs.get('tripId') || '').trim();
+      if (forcedId) {
+        tripId = forcedId;
+        return;
+      }
+      try {
+        const raw = localStorage.getItem(TIN_CUP_CONTEXT_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.tripId) tripId = String(parsed.tripId);
+        if (parsed && parsed.secondary === '0') useSecondaryTripDb = false;
+        if (parsed && parsed.secondary === '1') useSecondaryTripDb = true;
+      } catch (_err) {}
+    })();
+
+    const $ = (sel) => document.querySelector(sel);
+    const safeNumber = (val) => (val === '' || isNaN(val) ? 0 : parseFloat(val));
+    const bottomNavTrip = $('#bottomNavTrip');
+    const bottomNavToday = $('#bottomNavToday');
+    const bottomNavScore = $('#bottomNavScore');
+    const bottomNavResults = $('#bottomNavResults');
+    const bottomNavLodging = $('#bottomNavLodging');
+    const bottomNavAdmin = $('#bottomNavAdmin');
+    const tripApi = (path) => {
+      if (!useSecondaryTripDb) return path;
+      return path.includes('?') ? `${path}&myrtleBeach2026=true` : `${path}?myrtleBeach2026=true`;
+    };
+
+    const getCondoCount = () => {
+      const size = Number(trip?.baseGroupSize) || Number(trip?.groupSize) || DEFAULT_GROUP_SIZE;
+      return Math.max(1, Math.ceil(size / 4));
+    };
+    const getCondoNumber = (assignment) => {
+      const match = assignment && assignment.match(/^Condo (\d+) - Room ([AB])$/);
+      const condoNum = match ? parseInt(match[1], 10) : null;
+      return Number.isFinite(condoNum) ? condoNum : null;
+    };
+    const normalizeName = (value) => String(value || '').trim().toLowerCase();
+    const persistTripContext = () => {
+      if (!tripId) return;
+      try {
+        localStorage.setItem(TIN_CUP_CONTEXT_STORAGE_KEY, JSON.stringify({
+          tripId: String(tripId),
+          secondary: useSecondaryTripDb ? '1' : '0'
+        }));
+      } catch (_err) {}
+    };
+    const withContextHref = (path) => {
+      if (!tripId) return path;
+      const sep = path.includes('?') ? '&' : '?';
+      return `${path}${sep}tripId=${encodeURIComponent(String(tripId))}&secondary=${useSecondaryTripDb ? '1' : '0'}`;
+    };
+    const withExtraQuery = (path, queryText = '') => {
+      const base = withContextHref(path);
+      if (!queryText) return base;
+      const sep = base.includes('?') ? '&' : '?';
+      return `${base}${sep}${queryText}`;
+    };
+    const isTinCupTrip = (tripObj) => {
+      if (!tripObj || typeof tripObj !== 'object') return false;
+      const name = String(tripObj.name || '');
+      const groupName = String(tripObj.groupName || '');
+      const reservationNumber = String(tripObj.reservationNumber || '');
+      return /tin\s*cup/i.test(name)
+        || /tin\s*cup/i.test(groupName)
+        || /tin\s*cup/i.test(reservationNumber)
+        || (tripObj.tinCupLive && typeof tripObj.tinCupLive === 'object');
+    };
+
+    function getAdminCode() {
+      if (adminCode) return adminCode;
+      const code = prompt('Enter site admin code:');
+      if (!code) {
+        alert('Admin code is required for this action.');
+        return null;
+      }
+      adminCode = code;
+      return adminCode;
+    }
+
+    async function fetchJson(path) {
+      const res = await fetch(path);
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || `Request failed (${res.status})`);
+      return body;
+    }
+
+    async function updateParticipant(id, body, opts = {}) {
+      if (!tripId) throw new Error('Trip is not linked in database.');
+      const needsAdmin = opts.requireAdmin === true;
+      const headers = { 'Content-Type': 'application/json' };
+      if (needsAdmin) {
+        const code = getAdminCode();
+        if (!code) return;
+        headers['x-admin-code'] = code;
+      }
+      const updateRes = await fetch(tripApi(`/api/trips/${tripId}/participants/${id}`), {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(body || {}),
+      });
+      if (!updateRes.ok) {
+        const payload = await updateRes.json().catch(() => ({}));
+        throw new Error(payload.error || `Participant update failed (${updateRes.status})`);
+      }
+      const verify = await fetch(tripApi(`/api/trips/${tripId}/participants`));
+      if (!verify.ok) throw new Error('Failed to persist participant update');
+      await loadTrip();
+    }
+
+    async function swapParticipantAssignments(fromId, toId) {
+      if (!tripId) throw new Error('Trip is not linked in database.');
+      const first = participants.find((p) => String(p._id) === String(fromId));
+      const second = participants.find((p) => String(p._id) === String(toId));
+      if (!first || !second) throw new Error('Unable to find both participants for swap.');
+      if (String(first._id) === String(second._id)) return;
+
+      const code = getAdminCode();
+      if (!code) return;
+      const headers = {
+        'Content-Type': 'application/json',
+        'x-admin-code': code,
+      };
+      const firstAssignment = first.roomAssignment || null;
+      const secondAssignment = second.roomAssignment || null;
+
+      const updateOne = async (id, roomAssignment) => {
+        const response = await fetch(tripApi(`/api/trips/${tripId}/participants/${id}`), {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ roomAssignment }),
+        });
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}));
+          throw new Error(payload.error || `Participant update failed (${response.status})`);
+        }
+      };
+
+      await updateOne(first._id, secondAssignment);
+      await updateOne(second._id, firstAssignment);
+      await loadTrip();
+    }
+
+    function renderBaseGroupSizeSelect() {
+      const select = $('#baseGroupSizeSelect');
+      if (!select) return;
+      select.innerHTML = '';
+      BASE_GROUP_SIZES.forEach((n) => {
+        const opt = document.createElement('option');
+        opt.value = n;
+        opt.textContent = `${n} players`;
+        if (Number(trip?.baseGroupSize) === n) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function renderStatusList() {
+      const listEl = $('#allParticipantsList');
+      if (!listEl) return;
+      if (!Array.isArray(participants) || !participants.length) {
+        listEl.innerHTML = '<div style="color:var(--muted);">No participants yet.</div>';
+        return;
+      }
+      const sorted = [...participants].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      const perCol = Math.ceil(sorted.length / 2);
+      const cols = [sorted.slice(0, perCol), sorted.slice(perCol)];
+
+      let html = `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;">
+      `;
+      cols.forEach((col, colIdx) => {
+        const start = colIdx * perCol + 1;
+        html += `<ol start="${start}" style="margin:0;padding-left:18px;display:grid;gap:6px;">${col.map((p) =>
+          `<li style="display:grid;gap:6px;">
+            <div style="font-weight:600;color:#fff;">${p.name || ''}</div>
+            <input type="number" class="golfer-paid-input" data-id="${p._id}" value="${(p.totalPaidAmount || 0).toFixed(2)}" min="0" step="0.01" placeholder="Paid">
+          </li>`
+        ).join('')}</ol>`;
+      });
+      html += '</div>';
+      listEl.innerHTML = html;
+
+      document.querySelectorAll('.golfer-paid-input').forEach((input) => {
+        input.addEventListener('change', async function () {
+          await updateParticipant(this.dataset.id, { totalPaidAmount: safeNumber(this.value) }, { requireAdmin: true });
+        });
+      });
+    }
+
+    function renderParticipants() {
+      const container = $('#condoGroups');
+      const sidebar = $('#unassignedSidebar');
+      if (!container || !sidebar) return;
+      container.innerHTML = '';
+      if (!tripId) {
+        container.innerHTML = '<div style="color:var(--muted);">Trip not linked in database yet.</div>';
+        sidebar.innerHTML = '';
+        return;
+      }
+
+      const condoCount = getCondoCount();
+      const condoCounts = Array(condoCount).fill(0);
+      participants.forEach((g) => {
+        const condoNum = getCondoNumber(g.roomAssignment);
+        if (!condoNum) return;
+        const idx = condoNum - 1;
+        if (idx >= 0 && idx < condoCount) condoCounts[idx]++;
+      });
+
+      for (let i = 0; i < condoCount; i++) {
+        const div = document.createElement('div');
+        div.className = 'condo-group';
+        div.innerHTML = `<strong>Condo ${i + 1}</strong><div class="cards-grid"></div>`;
+        const grid = div.querySelector('.cards-grid');
+        const group = participants.filter((p) => getCondoNumber(p.roomAssignment) === i + 1);
+        group.forEach((p) => {
+          const match = p.roomAssignment && p.roomAssignment.match(/^Condo (\d+) - Room ([AB])$/);
+          const room = match ? match[2] : 'A';
+          const currentCondo = getCondoNumber(p.roomAssignment);
+          let moveOptions = '<option value="unassigned">Unassigned</option>';
+          for (let c = 1; c <= condoCount; c++) {
+            if (c !== currentCondo && condoCounts[c - 1] < 4) moveOptions += `<option value="${c}">Condo ${c}</option>`;
+          }
+          const card = document.createElement('div');
+          card.className = 'participant-card';
+          card.draggable = true;
+          card.dataset.participantId = p._id;
+          card.innerHTML = `
+            <div class="participant-summary">
+              <div>
+                <strong>${p.name || ''}</strong>
+                <div class="participant-meta">Condo ${currentCondo || '-'} · Room ${room} · ${p.wantsExtraNight ? 'Extra night' : 'Standard stay'}</div>
+              </div>
+            </div>
+            <details>
+              <summary>Edit Lodging</summary>
+              <div class="fields-row" style="margin-top:8px;">
+                <label class="stacked"><span>Name</span><input type="text" value="${p.name || ''}" readonly disabled></label>
+                <label class="stacked"><span>Room</span><select class="room-select" data-id="${p._id}">
+                  <option value="A"${room === 'A' ? ' selected' : ''}>A</option>
+                  <option value="B"${room === 'B' ? ' selected' : ''}>B</option>
+                </select></label>
+                <label class="stacked"><span>Extra Night</span><input type="checkbox" ${p.wantsExtraNight ? 'checked' : ''} class="extra-night-input" data-id="${p._id}"></label>
+              </div>
+              <div class="actions" style="margin-top:8px;">
+                <button class="remove-condo-btn" data-id="${p._id}" type="button">Unassign</button>
+                <select class="move-condo-select" data-id="${p._id}">
+                  <option value="">Move to...</option>${moveOptions}
+                </select>
+              </div>
+            </details>
+          `;
+          grid.appendChild(card);
+        });
+        container.appendChild(div);
+      }
+
+      const unassigned = participants.filter((p) => {
+        const condoNum = getCondoNumber(p.roomAssignment);
+        return !condoNum || condoNum < 1 || condoNum > condoCount;
+      });
+
+      sidebar.innerHTML = `
+        <div style="display:grid;gap:8px;">
+          <div>
+            <label style="color:var(--ink-soft);font-size:0.9rem;">Base Group Size</label>
+            <select id="baseGroupSizeSelect" style="width:100%;"></select>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <strong>Unassigned</strong><span style="color:var(--muted);">${unassigned.length}</span>
+          </div>
+          <div style="max-height:420px;overflow-y:auto;"><ul id="unassignedList"></ul></div>
+        </div>
+      `;
+      renderBaseGroupSizeSelect();
+
+      const ul = $('#unassignedList');
+      if (ul) {
+        ul.innerHTML = '';
+        if (!unassigned.length) {
+          ul.innerHTML = '<li style="color:var(--muted);">Everyone is assigned.</li>';
+        } else {
+          const condoOptions = Array.from({ length: condoCount }, (_, idx) => `<option value="${idx + 1}">Condo ${idx + 1}</option>`).join('');
+          unassigned.forEach((p) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <div style="margin-bottom:6px;font-weight:600;">${p.name || ''}</div>
+              <select class="assign-condo-select" data-id="${p._id}">
+                <option value="">Assign to condo...</option>${condoOptions}
+              </select>
+            `;
+            ul.appendChild(li);
+          });
+        }
+      }
+
+      const inCount = participants.filter((p) => p.status === 'in').length;
+      const nextIncrement = Math.ceil(Math.max(inCount, 1) / 4) * 4;
+      const needed = Math.max(nextIncrement - inCount, 0);
+      const statusRow = $('#statusSummaryRow');
+      if (statusRow) {
+        statusRow.innerHTML = `
+          <div style="display:grid;gap:6px;background:var(--panel-soft);border:1px solid var(--border);border-radius:12px;padding:12px;">
+            <strong>Confirmed Golfers: <span style="color:var(--accent);">${inCount}</span></strong>
+            <span style="color:var(--muted);font-size:0.95rem;">${needed > 0 ? `Need ${needed} more to reach the next full group of 4.` : `We have a full group of ${inCount}. Next target: ${nextIncrement + 4}.`}</span>
+          </div>
+        `;
+      }
+      const dataChip = $('#lodgingDataChip');
+      const rosterChip = $('#lodgingRosterChip');
+      const mapChip = $('#lodgingMapChip');
+      if (dataChip) {
+        dataChip.textContent = useSecondaryTripDb ? 'Secondary trip database' : 'Primary trip database';
+        dataChip.className = 'status-chip';
+      }
+      if (rosterChip) {
+        rosterChip.textContent = `${participants.length} lodging golfers`;
+        rosterChip.className = 'status-chip';
+      }
+      if (mapChip) {
+        mapChip.textContent = unassigned.length ? `${unassigned.length} unassigned` : 'All assigned';
+        mapChip.className = `status-chip${unassigned.length ? ' warn' : ' ready'}`;
+      }
+    }
+
+    function syncBottomNav() {
+      if (bottomNavTrip) bottomNavTrip.href = withContextHref('/tin-cup/trip-2026.html');
+      if (bottomNavToday) bottomNavToday.href = withContextHref('/tin-cup/today.html');
+      if (bottomNavScore) bottomNavScore.href = buildTinCupContextHref('/tin-cup/scorekeeper.html');
+      if (bottomNavResults) bottomNavResults.href = withContextHref('/tin-cup/leaderboard-2026.html');
+      if (bottomNavLodging) bottomNavLodging.href = withContextHref('/tin-cup/guests-lodging.html');
+      if (bottomNavAdmin) bottomNavAdmin.href = buildTinCupContextHref('/tin-cup/live-score-entry.html');
+    }
+
+    function bindInteractions() {
+      const condoGroups = $('#condoGroups');
+      if (condoGroups) {
+        condoGroups.addEventListener('dragstart', (e) => {
+          const card = e.target.closest('.participant-card[data-participant-id]');
+          if (!card) return;
+          lodgingDragParticipantId = String(card.dataset.participantId || '').trim() || null;
+          card.classList.add('is-dragging');
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', lodgingDragParticipantId || '');
+          }
+        });
+        condoGroups.addEventListener('dragover', (e) => {
+          const card = e.target.closest('.participant-card[data-participant-id]');
+          if (!card || !lodgingDragParticipantId) return;
+          const targetId = String(card.dataset.participantId || '').trim();
+          if (!targetId || targetId === lodgingDragParticipantId) return;
+          e.preventDefault();
+          if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+          condoGroups.querySelectorAll('.participant-card.is-drop-target').forEach((node) => {
+            if (node !== card) node.classList.remove('is-drop-target');
+          });
+          card.classList.add('is-drop-target');
+        });
+        condoGroups.addEventListener('dragleave', (e) => {
+          const card = e.target.closest('.participant-card[data-participant-id]');
+          if (!card) return;
+          const related = e.relatedTarget;
+          if (related && card.contains(related)) return;
+          card.classList.remove('is-drop-target');
+        });
+        condoGroups.addEventListener('dragend', () => {
+          lodgingDragParticipantId = null;
+          condoGroups.querySelectorAll('.participant-card.is-dragging,.participant-card.is-drop-target').forEach((node) => {
+            node.classList.remove('is-dragging', 'is-drop-target');
+          });
+        });
+        condoGroups.addEventListener('drop', async (e) => {
+          const card = e.target.closest('.participant-card[data-participant-id]');
+          if (!card || !lodgingDragParticipantId) return;
+          const fromId = lodgingDragParticipantId;
+          const toId = String(card.dataset.participantId || '').trim();
+          lodgingDragParticipantId = null;
+          condoGroups.querySelectorAll('.participant-card.is-dragging,.participant-card.is-drop-target').forEach((node) => {
+            node.classList.remove('is-dragging', 'is-drop-target');
+          });
+          if (!toId || toId === fromId) return;
+          e.preventDefault();
+          try {
+            await swapParticipantAssignments(fromId, toId);
+          } catch (error) {
+            alert(error.message || 'Unable to swap rooms right now.');
+          }
+        });
+        condoGroups.addEventListener('click', async (e) => {
+          if (e.target.classList.contains('remove-condo-btn')) {
+            await updateParticipant(e.target.dataset.id, { roomAssignment: null });
+          }
+        });
+        condoGroups.addEventListener('change', async (e) => {
+          if (e.target.classList.contains('move-condo-select')) {
+            const id = e.target.dataset.id;
+            const val = e.target.value;
+            if (!val) return;
+            const condoCount = getCondoCount();
+            if (val === 'unassigned') await updateParticipant(id, { roomAssignment: null });
+            else if (Number(val) >= 1 && Number(val) <= condoCount) await updateParticipant(id, { roomAssignment: `Condo ${val} - Room A` });
+          }
+          if (e.target.classList.contains('room-select')) {
+            const id = e.target.dataset.id;
+            const room = e.target.value;
+            const match = participants.find((p) => p._id === id)?.roomAssignment?.match(/^Condo (\d+) - Room ([AB])$/);
+            const condoNum = match ? match[1] : null;
+            if (condoNum) await updateParticipant(id, { roomAssignment: `Condo ${condoNum} - Room ${room}` });
+          }
+          if (e.target.classList.contains('extra-night-input')) {
+            await updateParticipant(e.target.dataset.id, { wantsExtraNight: e.target.checked });
+          }
+        });
+      }
+
+      const sidebar = $('#unassignedSidebar');
+      if (sidebar) {
+        sidebar.addEventListener('change', async (e) => {
+          if (e.target.classList.contains('assign-condo-select')) {
+            const condoNum = Number(e.target.value);
+            const id = e.target.dataset.id;
+            if (!condoNum || condoNum < 1 || condoNum > getCondoCount()) return;
+            await updateParticipant(id, { roomAssignment: `Condo ${condoNum} - Room A` });
+          }
+          if (e.target.id === 'baseGroupSizeSelect') {
+            await fetch(tripApi(`/api/trips/${tripId}`), {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ baseGroupSize: Number(e.target.value) || undefined })
+            });
+            await loadTrip();
+          }
+        });
+      }
+    }
+
+    function renderMeta() {
+      const meta = $('#tripMeta');
+      if (!meta) return;
+      if (!trip) {
+        meta.textContent = 'Tin Cup trip not found.';
+        return;
+      }
+      const total = participants.length;
+      meta.textContent = `${trip.name || 'Tin Cup'} | ${total} golfers | ${useSecondaryTripDb ? 'Secondary DB' : 'Primary DB'}`;
+      const back = $('#backLink');
+      if (back) back.href = withContextHref('/tin-cup/trip-2026.html');
+    }
+
+    async function loadTrip() {
+      const debugParts = [];
+      const runWithSource = async (secondaryFlag, fn) => {
+        const prev = useSecondaryTripDb;
+        useSecondaryTripDb = secondaryFlag === true;
+        try {
+          return await fn();
+        } finally {
+          useSecondaryTripDb = prev;
+        }
+      };
+      const sourceLabel = (secondaryFlag) => secondaryFlag ? 'secondary' : 'primary';
+      const fetchTripsFromSource = async (secondaryFlag) => {
+        return runWithSource(secondaryFlag, async () => {
+          try {
+            const trips = await fetchJson(tripApi('/api/trips'));
+            const arr = Array.isArray(trips) ? trips : [];
+            debugParts.push(`${sourceLabel(secondaryFlag)} list:${arr.length}`);
+            return { ok: true, trips: arr };
+          } catch (error) {
+            debugParts.push(`${sourceLabel(secondaryFlag)} list:err(${error.message || 'failed'})`);
+            return { ok: false, trips: [] };
+          }
+        });
+      };
+      const fetchTripBundleByIdFromSource = async (secondaryFlag, id) => {
+        return runWithSource(secondaryFlag, async () => {
+          try {
+            const bundle = await fetchJson(tripApi(`/api/trips/${id}`));
+            if (bundle && bundle.trip && bundle.trip._id) {
+              debugParts.push(`${sourceLabel(secondaryFlag)} id:${id} ok`);
+              return { ok: true, trip: bundle.trip, participants: Array.isArray(bundle.participants) ? bundle.participants : [] };
+            }
+            debugParts.push(`${sourceLabel(secondaryFlag)} id:${id} empty`);
+            return { ok: false, trip: null, participants: [] };
+          } catch (error) {
+            debugParts.push(`${sourceLabel(secondaryFlag)} id:${id} err(${error.message || 'failed'})`);
+            return { ok: false, trip: null, participants: [] };
+          }
+        });
+      };
+
+      let found = null;
+      let resolvedParticipants = [];
+      const preferSecondary = useSecondaryTripDb === true;
+
+      if (tripId) {
+        const byPreferred = await fetchTripBundleByIdFromSource(preferSecondary, tripId);
+        if (byPreferred.ok) {
+          found = byPreferred.trip;
+          resolvedParticipants = byPreferred.participants;
+          useSecondaryTripDb = preferSecondary;
+        } else {
+          const byOther = await fetchTripBundleByIdFromSource(!preferSecondary, tripId);
+          if (byOther.ok) {
+            found = byOther.trip;
+            resolvedParticipants = byOther.participants;
+            useSecondaryTripDb = !preferSecondary;
+          }
+        }
+      }
+
+      if (!found) {
+        const primary = await fetchTripsFromSource(false);
+        const secondary = await fetchTripsFromSource(true);
+        const secondaryMatch = secondary.trips.find((t) => isTinCupTrip(t));
+        const primaryMatch = primary.trips.find((t) => isTinCupTrip(t));
+
+        if (secondaryMatch && secondaryMatch._id) {
+          found = secondaryMatch;
+          useSecondaryTripDb = true;
+        } else if (primaryMatch && primaryMatch._id) {
+          found = primaryMatch;
+          useSecondaryTripDb = false;
+        }
+
+        if (found && found._id) {
+          tripId = String(found._id);
+          persistTripContext();
+          try {
+            resolvedParticipants = await fetchJson(tripApi(`/api/trips/${tripId}/participants`));
+            debugParts.push(`${sourceLabel(useSecondaryTripDb)} participants:${Array.isArray(resolvedParticipants) ? resolvedParticipants.length : 0}`);
+          } catch (error) {
+            debugParts.push(`${sourceLabel(useSecondaryTripDb)} participants:err(${error.message || 'failed'})`);
+            resolvedParticipants = [];
+          }
+        }
+      } else if (found && found._id) {
+        tripId = String(found._id);
+        persistTripContext();
+      }
+
+      if (!found) {
+        trip = null;
+        tripId = null;
+        participants = [];
+        renderMeta();
+        renderParticipants();
+        renderStatusList();
+        syncBottomNav();
+        return;
+      }
+
+      participants = Array.isArray(resolvedParticipants) ? resolvedParticipants : [];
+
+      trip = found;
+      renderMeta();
+      renderParticipants();
+      renderStatusList();
+      syncBottomNav();
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      bindInteractions();
+      await loadTrip();
+    });
+  </script>
+</body>
+</html>
