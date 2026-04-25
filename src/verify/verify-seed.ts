@@ -2,6 +2,7 @@ import path from "path";
 import { prisma } from "../db/client";
 import { readJsonFile } from "../utils/json";
 import { seedSchema } from "../schemas/seed";
+import type { HandicapConfig } from "../engine/handicap";
 import {
   computeHandicap,
   computeMatchPlay,
@@ -34,7 +35,7 @@ async function main() {
     throw new Error("Tournament not found. Did you run seed?");
   }
 
-  const handicapConfig = {
+  const handicapConfig: HandicapConfig = {
     factor: seed.tournament.handicap.factor,
     cap18: seed.tournament.handicap.cap18,
     par3Multiplier: seed.tournament.handicap.par3Multiplier,

@@ -3,6 +3,7 @@ import { existsSync } from "fs";
 import { prisma } from "../db/client";
 import { readJsonFile } from "../utils/json";
 import { seedSchema } from "../schemas/seed";
+import type { SeedData } from "../schemas/seed";
 
 const seedPath = path.resolve("seed", "tincup-2022-seed.json");
 
@@ -10,7 +11,9 @@ export async function seedDatabase() {
   const raw = readJsonFile(seedPath);
   const seed = seedSchema.parse(raw);
   const scoresPath = path.resolve("seed", "tincup-2022-scores.json");
-  const scoresData = existsSync(scoresPath) ? readJsonFile(scoresPath) : null;
+  const scoresData = existsSync(scoresPath)
+    ? readJsonFile<Pick<SeedData, "scores">>(scoresPath)
+    : null;
   const seedScores = scoresData?.scores ?? seed.scores ?? [];
   const playersWithScores = new Map<string, Set<string>>();
   for (const score of seedScores) {
