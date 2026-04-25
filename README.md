@@ -31,7 +31,13 @@ That snapshot is intentionally stored without changing the live Render app yet, 
 
 ## Environment
 - `DATABASE_URL`: Postgres connection string.
+- `PORT`: standalone app port.
 - `AUTO_SEED_ON_STARTUP`: set to `false` to disable auto-seeding (default is enabled).
+- `VERIFY_ALLOW_GOLDEN_FALLBACK`: optional flag for `npm run verify:seed` when hole-by-hole scores are not available.
+
+## Env Files
+- Root `.env.example`: variables for the standalone TypeScript/Postgres Tin Cup app in this repo.
+- [render-integration/main-repo-snapshot/.env.example](render-integration/main-repo-snapshot/.env.example): only the shared/live Tin Cup integration variables that matter while Tin Cup still runs inside the Tee Time BRS app.
 
 ## Scripts
 - npm run dev: start dev server
